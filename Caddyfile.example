@@ -1,0 +1,15 @@
+your-domain.example.com {
+    @desktoproot path /desktop /desktop/
+    redir @desktoproot /desktop/vnc.html?autoconnect=true&resize=scale&path=desktop/websockify
+
+    handle /desktop* {
+        forward_auth 127.0.0.1:3000 {
+            uri /api/authcheck
+        }
+        uri strip_prefix /desktop
+        reverse_proxy 127.0.0.1:6080
+    }
+    handle {
+        reverse_proxy 127.0.0.1:3000
+    }
+}

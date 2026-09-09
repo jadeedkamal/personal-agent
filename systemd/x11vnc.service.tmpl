@@ -1,0 +1,14 @@
+[Unit]
+Description=x11vnc server
+After=xfce.service
+Requires=xvfb.service
+
+[Service]
+Type=simple
+User=__USER__
+Environment=DISPLAY=:99
+ExecStart=/usr/bin/x11vnc -display :99 -forever -shared -rfbport 5900 -nopw -localhost
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

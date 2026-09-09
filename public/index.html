@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+<script>
+(function () {
+  try {
+    var t = localStorage.getItem('theme');
+    if (t) document.documentElement.setAttribute('data-theme', t);
+  } catch (e) {}
+})();
+</script>
+<title>Personal Agent</title>
+<link rel="manifest" href="/manifest.json" />
+<meta name="theme-color" content="#0b0d10" />
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" />
+<link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+
+<div id="login-screen">
+  <h1>
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M9 10h.01M15 10h.01M9 15c1 1 5 1 6 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    Personal Agent
+  </h1>
+  <form id="login-form">
+    <input id="password" type="password" placeholder="Password" autocomplete="current-password" required />
+    <button type="submit">Sign in</button>
+    <div id="login-error"></div>
+  </form>
+  <div id="login-divider"><span>or</span></div>
+  <a id="google-signin-btn" href="/api/auth/google">
+    <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.52 12.27c0-.85-.08-1.67-.22-2.45H12v4.64h6.47a5.53 5.53 0 01-2.4 3.63v3h3.88c2.27-2.09 3.57-5.17 3.57-8.82z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.07 7.93-2.91l-3.87-3c-1.08.72-2.46 1.15-4.06 1.15-3.12 0-5.77-2.11-6.71-4.94H1.29v3.1A12 12 0 0012 24z"/><path fill="#FBBC05" d="M5.29 14.3a7.2 7.2 0 010-4.6v-3.1H1.29a12 12 0 000 10.8z"/><path fill="#EA4335" d="M12 4.75c1.76 0 3.34.6 4.59 1.8l3.44-3.44C17.94 1.19 15.24 0 12 0A12 12 0 001.29 6.6l4 3.1C6.23 6.86 8.88 4.75 12 4.75z"/></svg>
+    Sign in with Google
+  </a>
+</div>
+
+<div id="app" hidden>
+  <div id="sidebar">
+    <div class="brand">
+      <div class="logo">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="white" stroke-width="1.8"/><path d="M9 10h.01M15 10h.01M9 15c1 1 5 1 6 0" stroke="white" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </div>
+      <span>Personal Agent</span>
+    </div>
+    <button id="new-chat-btn" class="btn-reset">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="white" stroke-width="2.2" stroke-linecap="round"/></svg>
+      New chat
+    </button>
+    <button id="improve-btn" class="btn-reset">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 3l1.9 4.6L18.5 9l-4.6 1.9L12 15.5l-1.9-4.6L5.5 9l4.6-1.9L12 3z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M19 15l.8 1.9L21.7 17.7l-1.9.8-.8 1.9-.8-1.9-1.9-.8 1.9-.8.8-1.9z" fill="currentColor"/></svg>
+      Improve the agent
+    </button>
+    <div class="search-box">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <input id="convo-search" placeholder="Search conversations" />
+    </div>
+    <div id="convo-list"></div>
+    <div id="sidebar-footer">
+      <span>test-agent · 20.44.52.130</span>
+      <button id="settings-btn" class="btn-reset" title="Settings">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" stroke-width="1.6"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1.08-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1.08 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9c.36.62.99 1 1.71 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+      </button>
+      <button id="theme-btn" class="btn-reset" title="Theme">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 3a9 9 0 100 18c1.5 0 2-.8 2-1.8 0-.5-.2-.9-.5-1.2-.3-.3-.5-.7-.5-1.2 0-1 .8-1.8 1.8-1.8H17a3 3 0 003-3c0-5-4-9-8-9z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="7.5" cy="10.5" r="1.1" fill="currentColor"/><circle cx="10.5" cy="7" r="1.1" fill="currentColor"/><circle cx="15" cy="7.5" r="1.1" fill="currentColor"/></svg>
+      </button>
+      <div id="theme-menu" hidden></div>
+    </div>
+  </div>
+  <div id="sidebar-overlay"></div>
+
+  <div id="chat-col">
+    <div id="header">
+      <div class="left">
+        <button id="menu-btn" class="btn-reset">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 6H20M4 12H20M4 18H20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+        <span id="header-title">New chat</span>
+      </div>
+      <div class="right-controls">
+        <button id="notif-btn" class="btn-reset" title="Notify me when a response is ready">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M13.7 21a2 2 0 01-3.4 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </button>
+        <button id="live-desktop-btn" class="btn-reset" title="Live Desktop">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none"><rect x="2.5" y="4" width="19" height="13" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M8 21h8M12 17v4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </button>
+        <div id="status-pill" class="online">
+          <span class="dot"></span>
+          <span class="label">Online</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="live-desktop-panel" hidden>
+      <div id="live-desktop-frame-wrap"></div>
+    </div>
+
+    <div id="history-toggle-bar" hidden>
+      <button id="history-toggle-btn" class="btn-reset">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M3 12a9 9 0 109-9M3 12h5M3 12V7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span id="history-toggle-label">View full history</span>
+      </button>
+    </div>
+
+    <div id="messages"><div id="messages-inner">
+      <div id="improve-banner" hidden>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 9v4M12 17h.01M10.3 3.9L2.7 17.3A1.8 1.8 0 004.3 20h15.4a1.8 1.8 0 001.6-2.7L13.7 3.9a1.8 1.8 0 00-3.4 0z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+        <span>Improve mode — the agent's working directory is its own source code, and it can edit and restart its own services. Changes to the backend will briefly disconnect this session.</span>
+      </div>
+      <div class="empty-state" id="empty-state">
+        <div class="logo">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="white" stroke-width="1.8"/><path d="M9 10h.01M15 10h.01M9 15c1 1 5 1 6 0" stroke="white" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </div>
+        <h2>What can I help with?</h2>
+        <p>Your agent has full access to the machine — files, shell, and the desktop.</p>
+      </div>
+    </div></div>
+
+    <div id="pending-attachments"></div>
+
+    <div id="model-picker-bar">
+      <select id="model-select" title="Model"></select>
+    </div>
+
+    <div id="composer-wrap">
+      <div id="composer">
+        <button id="attach-btn" class="icon-btn btn-reset" title="Attach file">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M21 11.5L12.5 20a5 5 0 01-7-7L14 4.5a3.5 3.5 0 015 5L10.5 18a2 2 0 01-3-3L15 7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <input type="file" id="file-input" hidden multiple />
+        <textarea id="input" rows="1" placeholder="Ask your agent to do something…"></textarea>
+        <button id="mic-btn" class="icon-btn btn-reset" title="Voice input">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="9" y="2" width="6" height="12" rx="3" stroke="currentColor" stroke-width="1.7"/><path d="M5 11a7 7 0 0014 0M12 18v3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        </button>
+        <button id="send-btn" class="btn-reset" title="Send">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M12 19V5M5 12l7-7 7 7" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="secure-input-modal" hidden>
+  <div class="settings-card">
+    <div class="settings-header">
+      <span>🔒 Secure input requested</span>
+    </div>
+    <div class="settings-body">
+      <p id="secure-input-prompt" class="secure-input-prompt"></p>
+      <input id="secure-input-value" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Value" />
+      <p class="secure-input-note">Typed directly into the focused field on the desktop — never sent as a chat message.</p>
+      <div class="secure-input-actions">
+        <button id="secure-input-cancel" class="btn-reset secure-input-btn secure-input-btn-secondary">Cancel</button>
+        <button id="secure-input-submit" class="btn-reset secure-input-btn secure-input-btn-primary">Submit</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="settings-modal" hidden>
+  <div class="settings-card">
+    <div class="settings-header">
+      <span>Settings</span>
+      <button id="settings-close" class="btn-reset" title="Close">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div id="settings-body" class="settings-body"></div>
+  </div>
+</div>
+
+<div id="image-viewer" hidden>
+  <button id="image-viewer-close" class="btn-reset" title="Close">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+  </button>
+  <img id="image-viewer-img" src="" alt="expanded view" />
+</div>
+
+<script src="/vendor/marked.js"></script>
+<script src="/app.js"></script>
+</body>
+</html>

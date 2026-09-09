@@ -1,0 +1,17 @@
+[Unit]
+Description=Personal Agent web backend
+After=network.target
+
+[Service]
+Type=simple
+User=__USER__
+WorkingDirectory=__REPO_DIR__
+EnvironmentFile=__HOME__/.secrets/claude.env
+EnvironmentFile=__HOME__/.secrets/agent.env
+ExecStart=/usr/bin/node __REPO_DIR__/server.js
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=false
+
+[Install]
+WantedBy=multi-user.target

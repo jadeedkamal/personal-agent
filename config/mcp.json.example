@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "gui": {
+      "command": "node",
+      "args": ["__HOME__/mcp-servers/gui-control/server.js"],
+      "env": { "GUI_DISPLAY": ":99", "INTERNAL_SHARED_SECRET": "__INTERNAL_SHARED_SECRET__" }
+    }
+  }
+}

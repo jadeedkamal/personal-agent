@@ -1,0 +1,19 @@
+{
+  "name": "agent-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.2.1",
+    "express-session": "^1.19.0",
+    "marked": "^18.0.11",
+    "multer": "^2.3.0",
+    "web-push": "^3.6.7"
+  }
+}
