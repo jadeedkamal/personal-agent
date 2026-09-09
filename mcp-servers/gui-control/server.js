@@ -292,6 +292,74 @@ const tools = [
       return { content: [{ type: 'text', text: `Activated window ${id}` }] };
     },
   },
+  {
+    name: 'download_file',
+    description: 'Download a file from an http(s) URL and save it onto the VM filesystem — e.g. a link the user shared that they want available locally. Returns the absolute path it was saved to. Not for browser-uploaded files (those already arrive via the chat attachment flow).',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        url: { type: 'string', description: 'http(s) URL to download.' },
+        destination: { type: 'string', description: 'Where to save it: an absolute path, or a path relative to the home directory. If omitted, saves to ~/Downloads/<filename inferred from the URL>.' },
+      },
+      required: ['url'],
+    },
+    handler: async ({ url, destination }) => {
+      let parsed;
+      try {
+        parsed = new URL(url);
+      } catch {
+        return { content: [{ type: 'text', text: `Invalid URL: ${url}` }], isError: true };
+      }
+      if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+        return { content: [{ type: 'text', text: `Unsupported protocol: ${parsed.protocol}` }], isError: true };
+      }
+
+      const home = os.homedir();
+      let destPath;
+      if (destination) {
+        destPath = path.isAbsolute(destination) ? destination : path.join(home, destination);
+      } else {
+        const base = path.basename(parsed.pathname) || `download-${Date.now()}`;
+        destPath = path.join(home, 'Downloads', base);
+      }
+      fs.mkdirSync(path.dirname(destPath), { recursive: true });
+
+      let res;
+      try {
+        res = await fetch(parsed.toString(), { redirect: 'follow' });
+      } catch (err) {
+        return { content: [{ type: 'text', text: `Download failed: ${err.message}` }], isError: true };
+      }
+      if (!res.ok || !res.body) {
+        return { content: [{ type: 'text', text: `Download failed: HTTP ${res.status}` }], isError: true };
+      }
+
+      const MAX_BYTES = 300 * 1024 * 1024;
+      const contentLength = Number(res.headers.get('content-length') || 0);
+      if (contentLength && contentLength > MAX_BYTES) {
+        return { content: [{ type: 'text', text: `File too large (${contentLength} bytes, limit ${MAX_BYTES}).` }], isError: true };
+      }
+
+      const tmpPath = `${destPath}.part`;
+      const writeStream = fs.createWriteStream(tmpPath);
+      let written = 0;
+      try {
+        for await (const chunk of res.body) {
+          written += chunk.length;
+          if (written > MAX_BYTES) throw new Error(`File exceeds ${MAX_BYTES} byte limit`);
+          if (!writeStream.write(chunk)) await new Promise((resolve) => writeStream.once('drain', resolve));
+        }
+        await new Promise((resolve, reject) => writeStream.end((err) => (err ? reject(err) : resolve())));
+      } catch (err) {
+        writeStream.destroy();
+        fs.unlink(tmpPath, () => {});
+        return { content: [{ type: 'text', text: `Download failed: ${err.message}` }], isError: true };
+      }
+      fs.renameSync(tmpPath, destPath);
+
+      return { content: [{ type: 'text', text: `Saved ${written} bytes to ${destPath}` }] };
+    },
+  },
 ];
 
 const server = new Server({ name: 'gui-control', version: '1.0.0' }, { capabilities: { tools: {} } });

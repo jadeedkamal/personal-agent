@@ -1,0 +1,10 @@
+{
+  "name": "video-downloader",
+  "version": "1.0.0",
+  "description": "MCP server exposing a tool to download videos (YouTube and other yt-dlp-supported sites) into the app's shared file store.",
+  "main": "server.js",
+  "license": "ISC",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0"
+  }
+}

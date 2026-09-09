@@ -3,3 +3,5 @@ data/
 config/mcp.json
 *.log
 .DS_Store
+.wwebjs_auth/
+.wwebjs_cache/

@@ -1,0 +1,10 @@
+{
+  "name": "whatsapp",
+  "version": "1.0.0",
+  "description": "MCP server exposing tools to send WhatsApp text/media messages via the whatsapp-bridge service.",
+  "main": "server.js",
+  "license": "ISC",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0"
+  }
+}
