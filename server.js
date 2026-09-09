@@ -398,6 +398,66 @@ app.post('/api/upload', requireAuth, upload.single('file'), (req, res) => {
 app.use('/uploads', requireAuth, express.static(UPLOADS_DIR));
 app.use('/tool-images', requireAuth, express.static(TOOL_IMAGES_DIR));
 
+// ---------- General file storage (not tied to chat) ----------
+
+const FILES_DIR = path.join(os.homedir(), 'uploads');
+fs.mkdirSync(FILES_DIR, { recursive: true });
+
+function sanitizeFileName(name) {
+  const base = path.basename(name).replace(/[/\\]/g, '_').replace(/^\.+/, '');
+  return base || 'file';
+}
+
+function uniqueFileName(dir, name) {
+  const ext = path.extname(name);
+  const stem = name.slice(0, name.length - ext.length);
+  let candidate = name;
+  let n = 1;
+  while (fs.existsSync(path.join(dir, candidate))) {
+    candidate = `${stem} (${n})${ext}`;
+    n++;
+  }
+  return candidate;
+}
+
+const filesUpload = multer({
+  storage: multer.diskStorage({
+    destination: FILES_DIR,
+    filename: (req, file, cb) => cb(null, uniqueFileName(FILES_DIR, sanitizeFileName(file.originalname))),
+  }),
+  limits: { fileSize: 500 * 1024 * 1024 },
+});
+
+app.get('/api/files', requireAuth, (req, res) => {
+  const entries = fs.readdirSync(FILES_DIR, { withFileTypes: true })
+    .filter((e) => e.isFile())
+    .map((e) => {
+      const stat = fs.statSync(path.join(FILES_DIR, e.name));
+      return { name: e.name, size: stat.size, mtime: stat.mtimeMs };
+    })
+    .sort((a, b) => b.mtime - a.mtime);
+  res.json(entries);
+});
+
+app.post('/api/files/upload', requireAuth, filesUpload.array('files', 20), (req, res) => {
+  res.json({ uploaded: (req.files || []).map((f) => f.filename) });
+});
+
+app.get('/api/files/download/:name', requireAuth, (req, res) => {
+  const name = path.basename(req.params.name);
+  const filePath = path.join(FILES_DIR, name);
+  if (!fs.existsSync(filePath)) return res.status(404).end();
+  res.download(filePath, name);
+});
+
+app.delete('/api/files/:name', requireAuth, (req, res) => {
+  const name = path.basename(req.params.name);
+  const filePath = path.join(FILES_DIR, name);
+  if (!fs.existsSync(filePath)) return res.status(404).json({ error: 'not found' });
+  fs.unlinkSync(filePath);
+  res.json({ ok: true });
+});
+
 // ---------- Claude streaming ----------
 
 // A generation runs independently of any particular HTTP connection: closing the browser,

@@ -207,6 +207,93 @@ function closeSettings() { settingsModal.hidden = true; }
 settingsBtn.addEventListener('click', openSettings);
 $('#settings-close').addEventListener('click', closeSettings);
 settingsModal.addEventListener('click', (e) => { if (e.target === settingsModal) closeSettings(); });
+
+// ---------------- Files (VM file store, independent of chat) ----------------
+
+const filesBtn = $('#files-btn');
+const filesModal = $('#files-modal');
+const filesList = $('#files-list');
+const filesDrop = $('#files-drop');
+const filesPickBtn = $('#files-pick-btn');
+const filesInput = $('#files-input');
+
+function formatFileSize(n) {
+  if (n < 1024) return `${n} B`;
+  if (n < 1024 ** 2) return `${(n / 1024).toFixed(1)} KB`;
+  if (n < 1024 ** 3) return `${(n / 1024 ** 2).toFixed(1)} MB`;
+  return `${(n / 1024 ** 3).toFixed(1)} GB`;
+}
+
+function formatFileDate(ms) {
+  return new Date(ms).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+}
+
+async function loadFilesList() {
+  filesList.innerHTML = '<div class="settings-loading">Loading…</div>';
+  try {
+    const r = await fetch('/api/files');
+    if (!r.ok) throw new Error('request failed');
+    const files = await r.json();
+    if (!files.length) {
+      filesList.innerHTML = '<div class="files-empty">No files uploaded yet.</div>';
+      return;
+    }
+    filesList.innerHTML = '';
+    for (const f of files) {
+      const row = document.createElement('div');
+      row.className = 'files-row';
+      row.innerHTML = `
+        <span class="fname" title="${escapeHtml(f.name)}">${escapeHtml(f.name)}</span>
+        <span class="fmeta">${formatFileSize(f.size)} · ${formatFileDate(f.mtime)}</span>
+        <span class="factions">
+          <button class="dl-btn btn-reset" title="Download"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 4v11m0 0l-4-4m4 4l4-4M5 19h14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button class="del-btn btn-reset" title="Delete"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button>
+        </span>`;
+      row.querySelector('.dl-btn').addEventListener('click', () => {
+        window.open(`/api/files/download/${encodeURIComponent(f.name)}`, '_blank');
+      });
+      row.querySelector('.del-btn').addEventListener('click', async () => {
+        if (!confirm(`Delete "${f.name}"?`)) return;
+        await fetch(`/api/files/${encodeURIComponent(f.name)}`, { method: 'DELETE' });
+        loadFilesList();
+      });
+      filesList.appendChild(row);
+    }
+  } catch {
+    filesList.innerHTML = '<div class="settings-loading">Failed to load files</div>';
+  }
+}
+
+async function uploadToFileStore(files) {
+  const form = new FormData();
+  for (const file of files) form.append('files', file);
+  try {
+    await fetch('/api/files/upload', { method: 'POST', body: form });
+  } catch {}
+  loadFilesList();
+}
+
+function openFiles() { filesModal.hidden = false; loadFilesList(); }
+function closeFiles() { filesModal.hidden = true; }
+
+filesBtn.addEventListener('click', openFiles);
+$('#files-close').addEventListener('click', closeFiles);
+filesModal.addEventListener('click', (e) => { if (e.target === filesModal) closeFiles(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !filesModal.hidden) closeFiles(); });
+
+filesPickBtn.addEventListener('click', () => filesInput.click());
+filesInput.addEventListener('change', async () => {
+  if (filesInput.files.length) await uploadToFileStore(filesInput.files);
+  filesInput.value = '';
+});
+
+filesDrop.addEventListener('dragover', (e) => { e.preventDefault(); filesDrop.classList.add('drag-active'); });
+filesDrop.addEventListener('dragleave', () => filesDrop.classList.remove('drag-active'));
+filesDrop.addEventListener('drop', async (e) => {
+  e.preventDefault();
+  filesDrop.classList.remove('drag-active');
+  if (e.dataTransfer.files && e.dataTransfer.files.length) await uploadToFileStore(e.dataTransfer.files);
+});
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !settingsModal.hidden) closeSettings(); });
 
 // ---------------- Theme ----------------
@@ -469,6 +556,21 @@ renderer.code = (code, lang) => {
   const codeText = typeof code === 'object' ? code.text : code;
   const language = typeof code === 'object' ? code.lang : lang;
   return `<div class="code-block"><div class="code-header"><span>${language || 'text'}</span></div><pre><code>${highlightCode(codeText || '')}</code></pre></div>`;
+};
+renderer.link = function (hrefArg, titleArg, textArg) {
+  const isTokenApi = typeof hrefArg === 'object' && hrefArg !== null;
+  const href = isTokenApi ? hrefArg.href : hrefArg;
+  const title = isTokenApi ? hrefArg.title : titleArg;
+  const text = isTokenApi
+    ? (this.parser ? this.parser.parseInline(hrefArg.tokens) : escapeHtml(hrefArg.text || ''))
+    : textArg;
+  const safeHref = href || '#';
+  const isDownload = /^\/api\/files\/download\//.test(safeHref);
+  const titleAttr = title ? ` title="${escapeHtml(title)}"` : '';
+  const dlIcon = isDownload
+    ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 4v11m0 0l-4-4m4 4l4-4M5 19h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+    : '';
+  return `<a href="${escapeHtml(safeHref)}"${isDownload ? ' class="dl-link-btn"' : ''}${titleAttr} target="_blank" rel="noopener">${dlIcon}${text}</a>`;
 };
 marked.setOptions({ renderer, breaks: true });
 
@@ -1077,9 +1179,8 @@ function renderPendingAttachments() {
   }
 }
 
-attachBtn.addEventListener('click', () => fileInput.click());
-fileInput.addEventListener('change', async () => {
-  for (const file of fileInput.files) {
+async function uploadFiles(files) {
+  for (const file of files) {
     const form = new FormData();
     form.append('file', file);
     try {
@@ -1090,8 +1191,48 @@ fileInput.addEventListener('change', async () => {
       pendingFiles.push(entry);
     } catch {}
   }
-  fileInput.value = '';
   renderPendingAttachments();
+}
+
+attachBtn.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', async () => {
+  await uploadFiles(fileInput.files);
+  fileInput.value = '';
+});
+
+// ---------------- Drag & drop upload ----------------
+
+const dropOverlay = $('#drop-overlay');
+let dragDepth = 0;
+
+function isFileDrag(e) {
+  if (!filesModal.hidden) return false; // Files modal has its own drop zone/handlers
+  return e.dataTransfer && Array.from(e.dataTransfer.types || []).includes('Files');
+}
+
+window.addEventListener('dragenter', (e) => {
+  if (!isFileDrag(e)) return;
+  e.preventDefault();
+  dragDepth++;
+  dropOverlay.hidden = false;
+});
+window.addEventListener('dragover', (e) => {
+  if (!isFileDrag(e)) return;
+  e.preventDefault();
+});
+window.addEventListener('dragleave', (e) => {
+  if (!isFileDrag(e)) return;
+  dragDepth = Math.max(0, dragDepth - 1);
+  if (dragDepth === 0) dropOverlay.hidden = true;
+});
+window.addEventListener('drop', async (e) => {
+  if (!isFileDrag(e)) return;
+  e.preventDefault();
+  dragDepth = 0;
+  dropOverlay.hidden = true;
+  if (e.dataTransfer.files && e.dataTransfer.files.length) {
+    await uploadFiles(e.dataTransfer.files);
+  }
 });
 
 // ---------------- Voice input ----------------
