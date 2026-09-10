@@ -1,0 +1,338 @@
+/* ==========================================================================
+   Skeuomorphic theme — "Field Recorder"
+   Brushed-gunmetal chassis + saddle-leather insert + amber-phosphor VFD
+   readouts + brass accent. Adds material/depth on top of the existing
+   token system; does not touch styles.css or any behavior/markup.
+   ========================================================================== */
+
+html[data-theme="skeuomorphic"] {
+  color-scheme: dark;
+  --bg: #2b2d30; --panel: #35373b; --panel-2: #2a2c2f; --border: #1c1d1f;
+  --text: #f1e6d6; --muted: #b9b2a6; --muted-2: #8a8378;
+  --accent: #e8a33d; --accent-strong: #ffc266; --accent-dim: rgba(232,163,61,0.18);
+  --online: #6bcf6b; --working: #e8a33d; --danger: #e0524a;
+  --user-bubble: #4d3020; --assistant-bubble: #35373b;
+
+  --sk-metal-1: #a8adb2; --sk-metal-2: #75797d; --sk-metal-3: #46484c; --sk-metal-4: #232427;
+  --sk-leather: #3a2418; --sk-leather-2: #2c1b12; --sk-stitch: rgba(241,230,214,0.16);
+  --sk-vfd-bg: #0b1310; --sk-vfd-text: #ffb454; --sk-vfd-glow: rgba(255,180,84,0.35);
+  --sk-font-display: 'Space Grotesk', -apple-system, sans-serif;
+  --sk-font-body: 'Manrope', -apple-system, sans-serif;
+}
+
+html[data-theme="skeuomorphic"] body {
+  font-family: var(--sk-font-body);
+  background:
+    radial-gradient(ellipse at 50% -10%, rgba(255,255,255,0.05), transparent 60%),
+    repeating-linear-gradient(100deg, rgba(255,255,255,0.025) 0px, rgba(255,255,255,0.025) 1px, transparent 1px, transparent 3px),
+    linear-gradient(180deg, #34363a, #202124);
+}
+
+html[data-theme="skeuomorphic"] #header-title,
+html[data-theme="skeuomorphic"] #sidebar .brand span,
+html[data-theme="skeuomorphic"] .empty-state h2,
+html[data-theme="skeuomorphic"] .convo-row .title,
+html[data-theme="skeuomorphic"] .convo-section-label,
+html[data-theme="skeuomorphic"] .settings-header span,
+html[data-theme="skeuomorphic"] #login-screen h1,
+html[data-theme="skeuomorphic"] .tool-feed-header .label,
+html[data-theme="skeuomorphic"] .files-drop span {
+  font-family: var(--sk-font-display);
+}
+
+/* Raised-metal button recipe, reused by every physical control */
+html[data-theme="skeuomorphic"] .sk-raised,
+html[data-theme="skeuomorphic"] #new-chat-btn,
+html[data-theme="skeuomorphic"] #improve-btn,
+html[data-theme="skeuomorphic"] #google-signin-btn,
+html[data-theme="skeuomorphic"] #login-form button,
+html[data-theme="skeuomorphic"] .icon-btn,
+html[data-theme="skeuomorphic"] #send-btn,
+html[data-theme="skeuomorphic"] #live-desktop-btn,
+html[data-theme="skeuomorphic"] #notif-btn,
+html[data-theme="skeuomorphic"] #theme-btn,
+html[data-theme="skeuomorphic"] #settings-btn,
+html[data-theme="skeuomorphic"] #history-toggle-btn,
+html[data-theme="skeuomorphic"] .files-pick-btn,
+html[data-theme="skeuomorphic"] .secure-input-btn,
+html[data-theme="skeuomorphic"] #image-viewer-close {
+  background: linear-gradient(180deg, var(--sk-metal-1), var(--sk-metal-2));
+  border: 1px solid var(--sk-metal-4);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.45),
+    inset 0 -6px 10px -6px rgba(0,0,0,0.35),
+    0 1px 1px rgba(0,0,0,0.3),
+    0 3px 6px rgba(0,0,0,0.35);
+  color: var(--sk-metal-4);
+  text-shadow: 0 1px 0 rgba(255,255,255,0.25);
+  transition: transform .08s ease, box-shadow .08s ease;
+}
+html[data-theme="skeuomorphic"] .sk-raised:hover,
+html[data-theme="skeuomorphic"] #new-chat-btn:hover,
+html[data-theme="skeuomorphic"] #improve-btn:hover,
+html[data-theme="skeuomorphic"] #google-signin-btn:hover,
+html[data-theme="skeuomorphic"] .icon-btn:hover,
+html[data-theme="skeuomorphic"] #history-toggle-btn:hover,
+html[data-theme="skeuomorphic"] .files-pick-btn:hover {
+  background: linear-gradient(180deg, #b4b9be, var(--sk-metal-1));
+}
+html[data-theme="skeuomorphic"] .sk-raised:active,
+html[data-theme="skeuomorphic"] #new-chat-btn:active,
+html[data-theme="skeuomorphic"] #improve-btn:active,
+html[data-theme="skeuomorphic"] .icon-btn:active,
+html[data-theme="skeuomorphic"] #send-btn:active,
+html[data-theme="skeuomorphic"] #live-desktop-btn:active,
+html[data-theme="skeuomorphic"] .secure-input-btn:active {
+  transform: translateY(1px);
+  box-shadow: inset 0 2px 5px rgba(0,0,0,0.45), inset 0 1px 0 rgba(0,0,0,0.2);
+}
+
+/* Primary (amber) buttons — same raised recipe, brass finish */
+html[data-theme="skeuomorphic"] #new-chat-btn,
+html[data-theme="skeuomorphic"] #send-btn,
+html[data-theme="skeuomorphic"] #login-form button,
+html[data-theme="skeuomorphic"] .secure-input-btn-primary {
+  background: linear-gradient(180deg, var(--accent-strong), var(--accent));
+  color: #2a1a06;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.35);
+  border-color: #8a5c1f;
+}
+html[data-theme="skeuomorphic"] #new-chat-btn:hover,
+html[data-theme="skeuomorphic"] #send-btn:hover {
+  background: linear-gradient(180deg, #ffd68a, var(--accent-strong));
+}
+html[data-theme="skeuomorphic"] #send-btn.stop {
+  background: linear-gradient(180deg, #ff8f87, var(--danger)); border-color: #7a201a; color: #3a0a07;
+}
+
+html[data-theme="skeuomorphic"] #improve-btn svg,
+html[data-theme="skeuomorphic"] #improve-btn { color: var(--sk-metal-4); }
+html[data-theme="skeuomorphic"] #improve-btn:hover { color: #5a3c00; border-color: var(--accent); }
+
+/* Icon-only round controls read as inset dials rather than raised pads */
+html[data-theme="skeuomorphic"] .icon-btn,
+html[data-theme="skeuomorphic"] #live-desktop-btn,
+html[data-theme="skeuomorphic"] #notif-btn,
+html[data-theme="skeuomorphic"] #theme-btn,
+html[data-theme="skeuomorphic"] #settings-btn,
+html[data-theme="skeuomorphic"] #image-viewer-close {
+  border-radius: 999px;
+}
+html[data-theme="skeuomorphic"] .icon-btn.active,
+html[data-theme="skeuomorphic"] #live-desktop-btn.active,
+html[data-theme="skeuomorphic"] #notif-btn.active {
+  background: linear-gradient(180deg, var(--accent-strong), var(--accent));
+  color: #2a1a06; border-color: #8a5c1f;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.35), 0 0 10px var(--sk-vfd-glow);
+}
+
+/* ---------- Login ---------- */
+html[data-theme="skeuomorphic"] #login-screen {
+  background:
+    radial-gradient(ellipse at 50% 20%, rgba(255,255,255,0.06), transparent 55%),
+    repeating-linear-gradient(100deg, rgba(255,255,255,0.02) 0px, rgba(255,255,255,0.02) 1px, transparent 1px, transparent 3px),
+    linear-gradient(180deg, #34363a, #1e1f21);
+}
+html[data-theme="skeuomorphic"] #login-screen h1 {
+  color: var(--text); letter-spacing: 0.01em;
+}
+html[data-theme="skeuomorphic"] #login-screen h1 svg { color: var(--accent); }
+html[data-theme="skeuomorphic"] #login-form input {
+  background: var(--sk-vfd-bg); border: 2px solid var(--sk-metal-4); color: var(--sk-vfd-text);
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.8);
+  font-family: 'JetBrains Mono', monospace;
+}
+html[data-theme="skeuomorphic"] #login-form input::placeholder { color: rgba(255,180,84,0.4); }
+html[data-theme="skeuomorphic"] #google-signin-btn { color: var(--sk-metal-4); font-family: var(--sk-font-body); }
+
+/* ---------- Sidebar ---------- */
+html[data-theme="skeuomorphic"] #sidebar {
+  background: linear-gradient(180deg, #37393d, #2c2e31);
+  border-right: 3px solid var(--sk-metal-4);
+  box-shadow: inset -6px 0 12px -8px rgba(0,0,0,0.6);
+}
+html[data-theme="skeuomorphic"] #sidebar .brand .logo,
+html[data-theme="skeuomorphic"] .empty-state .logo {
+  background: linear-gradient(180deg, var(--accent-strong), var(--accent));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.5), inset 0 -3px 6px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.4);
+  border: 1px solid #8a5c1f;
+}
+html[data-theme="skeuomorphic"] #sidebar .brand .logo svg,
+html[data-theme="skeuomorphic"] .empty-state .logo svg { filter: drop-shadow(0 1px 0 rgba(255,255,255,.3)); stroke: #2a1a06 !important; }
+
+html[data-theme="skeuomorphic"] .search-box {
+  background: var(--sk-vfd-bg); border: 2px solid var(--sk-metal-4);
+  box-shadow: inset 0 2px 5px rgba(0,0,0,0.75);
+}
+html[data-theme="skeuomorphic"] .search-box input { font-family: 'JetBrains Mono', monospace; color: var(--sk-vfd-text); }
+html[data-theme="skeuomorphic"] .search-box input::placeholder { color: rgba(255,180,84,0.4); }
+html[data-theme="skeuomorphic"] .search-box svg { color: rgba(255,180,84,0.6); }
+
+html[data-theme="skeuomorphic"] .convo-row {
+  border: 1px solid transparent; border-bottom: 1px solid rgba(0,0,0,0.25);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.04);
+}
+html[data-theme="skeuomorphic"] .convo-row:hover { background: rgba(255,255,255,0.04); }
+html[data-theme="skeuomorphic"] .convo-row.active {
+  background: linear-gradient(180deg, rgba(232,163,61,0.22), rgba(232,163,61,0.08));
+  border: 1px solid rgba(232,163,61,0.4);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+}
+html[data-theme="skeuomorphic"] .convo-section-label { text-transform: none; letter-spacing: 0.02em; opacity: 0.8; }
+
+html[data-theme="skeuomorphic"] #sidebar-footer {
+  background: linear-gradient(180deg, var(--sk-metal-3), var(--sk-metal-4));
+  border-top: 1px solid rgba(255,255,255,0.08);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), inset 0 4px 8px -6px rgba(0,0,0,0.5);
+  color: var(--sk-metal-1); font-family: 'JetBrains Mono', monospace; font-size: 11px;
+}
+html[data-theme="skeuomorphic"] #theme-btn, html[data-theme="skeuomorphic"] #settings-btn,
+html[data-theme="skeuomorphic"] #files-btn { color: var(--sk-metal-1); background: none; border: none; box-shadow: none; }
+html[data-theme="skeuomorphic"] #theme-btn:hover, html[data-theme="skeuomorphic"] #settings-btn:hover,
+html[data-theme="skeuomorphic"] #files-btn:hover { color: var(--accent); background: rgba(0,0,0,0.2); }
+html[data-theme="skeuomorphic"] #theme-menu {
+  background: linear-gradient(180deg, var(--sk-metal-2), var(--sk-metal-3));
+  border: 1px solid var(--sk-metal-4); box-shadow: 0 10px 28px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.15);
+}
+html[data-theme="skeuomorphic"] .theme-option { color: var(--text); }
+html[data-theme="skeuomorphic"] .theme-option:hover { background: rgba(0,0,0,0.25); }
+
+/* ---------- Header ---------- */
+html[data-theme="skeuomorphic"] #header {
+  background: linear-gradient(180deg, var(--sk-metal-2), var(--sk-metal-3));
+  border-bottom: 3px solid var(--sk-metal-4);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 3px 8px rgba(0,0,0,0.3);
+}
+html[data-theme="skeuomorphic"] #header-title { color: var(--text); }
+html[data-theme="skeuomorphic"] #menu-btn { color: var(--sk-metal-1); }
+
+html[data-theme="skeuomorphic"] #status-pill {
+  background: var(--sk-vfd-bg); border: 2px solid var(--sk-metal-4);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.8);
+  font-family: 'JetBrains Mono', monospace;
+}
+html[data-theme="skeuomorphic"] #status-pill span.label { color: var(--sk-vfd-text); text-shadow: 0 0 6px var(--sk-vfd-glow); }
+html[data-theme="skeuomorphic"] #status-pill .dot {
+  box-shadow: 0 0 6px 1px currentColor;
+}
+html[data-theme="skeuomorphic"] #status-pill.online .dot { background: var(--online); color: var(--online); }
+html[data-theme="skeuomorphic"] #status-pill.working .dot { background: var(--working); color: var(--working); box-shadow: 0 0 8px 2px var(--working); }
+
+/* ---------- Live desktop / history bar ---------- */
+html[data-theme="skeuomorphic"] #live-desktop-panel {
+  border: 4px solid var(--sk-metal-4); border-top: none;
+  box-shadow: inset 0 4px 10px rgba(0,0,0,0.6);
+}
+html[data-theme="skeuomorphic"] #history-toggle-btn {
+  font-family: 'JetBrains Mono', monospace; color: var(--sk-metal-4);
+}
+
+/* ---------- Messages ---------- */
+html[data-theme="skeuomorphic"] .empty-state p { font-family: var(--sk-font-body); }
+
+html[data-theme="skeuomorphic"] .msg-row.user .bubble {
+  background: linear-gradient(180deg, #5a3a26, var(--user-bubble));
+  border: 1px solid var(--sk-leather-2);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -8px 14px -10px rgba(0,0,0,0.5), 0 2px 4px rgba(0,0,0,0.3);
+  border-radius: 10px 10px 3px 10px;
+  color: var(--sk-stitch);
+  color: #f1e6d6;
+}
+html[data-theme="skeuomorphic"] .msg-row.assistant .bubble {
+  background: linear-gradient(180deg, #3d3f43, var(--assistant-bubble));
+  border: 1px solid var(--sk-metal-4);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 2px 5px rgba(0,0,0,0.35);
+  border-radius: 10px 10px 10px 3px;
+}
+html[data-theme="skeuomorphic"] .msg-row.error .bubble {
+  background: linear-gradient(180deg, #4a231f, #391b17); border-color: #6b2c2c;
+}
+
+html[data-theme="skeuomorphic"] .bubble code {
+  background: rgba(0,0,0,0.35); border: 1px solid rgba(0,0,0,0.4);
+}
+html[data-theme="skeuomorphic"] .code-block {
+  background: var(--sk-vfd-bg); border: 2px solid var(--sk-metal-4);
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.7);
+}
+html[data-theme="skeuomorphic"] .code-block .code-header {
+  background: var(--sk-metal-4); color: var(--sk-metal-1); border-bottom-color: rgba(0,0,0,0.5);
+}
+html[data-theme="skeuomorphic"] .code-block pre { color: var(--sk-vfd-text); text-shadow: 0 0 3px var(--sk-vfd-glow); }
+html[data-theme="skeuomorphic"] .tok-kw { color: #7fd9ff; } html[data-theme="skeuomorphic"] .tok-str { color: #ffd08a; }
+html[data-theme="skeuomorphic"] .tok-num { color: #d3a3ff; } html[data-theme="skeuomorphic"] .tok-com { color: #7a8a80; }
+
+html[data-theme="skeuomorphic"] .bubble a.dl-link-btn {
+  background: linear-gradient(180deg, var(--accent-strong), var(--accent)); color: #2a1a06;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.4), 0 2px 4px rgba(0,0,0,0.3); border: 1px solid #8a5c1f;
+}
+
+/* Tool feed = VFD instrument readout, inset into the bubble */
+html[data-theme="skeuomorphic"] .tool-feed {
+  background: var(--sk-vfd-bg); border: 2px solid var(--sk-metal-4);
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.8), inset 0 0 24px rgba(255,180,84,0.04);
+  border-radius: 8px;
+}
+html[data-theme="skeuomorphic"] .tool-feed-header .label,
+html[data-theme="skeuomorphic"] .tool-step { color: var(--sk-vfd-text); text-shadow: 0 0 4px var(--sk-vfd-glow); }
+html[data-theme="skeuomorphic"] .tool-step:not(.running) { opacity: 0.7; }
+html[data-theme="skeuomorphic"] .tool-feed-body { border-top-color: rgba(255,180,84,0.15); }
+html[data-theme="skeuomorphic"] .tool-step-thumb, html[data-theme="skeuomorphic"] .gallery-thumb {
+  border: 1px solid var(--sk-metal-4); box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+}
+
+/* ---------- Modals ---------- */
+html[data-theme="skeuomorphic"] .settings-card {
+  background: linear-gradient(180deg, var(--sk-metal-2), var(--sk-metal-3));
+  border: 1px solid var(--sk-metal-4);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.12);
+}
+html[data-theme="skeuomorphic"] .settings-header {
+  background: var(--sk-metal-3); border-bottom-color: var(--sk-metal-4); color: var(--text);
+}
+html[data-theme="skeuomorphic"] .settings-row { border-bottom-color: rgba(0,0,0,0.3); }
+html[data-theme="skeuomorphic"] .settings-select,
+html[data-theme="skeuomorphic"] #model-select {
+  background: var(--sk-vfd-bg); border: 2px solid var(--sk-metal-4); color: var(--sk-vfd-text);
+  font-family: 'JetBrains Mono', monospace; box-shadow: inset 0 2px 4px rgba(0,0,0,0.7);
+}
+html[data-theme="skeuomorphic"] #secure-input-modal .settings-header { border-bottom-color: var(--accent); }
+html[data-theme="skeuomorphic"] #secure-input-value {
+  background: var(--sk-vfd-bg); border: 2px solid var(--sk-metal-4); color: var(--sk-vfd-text);
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.8); font-family: 'JetBrains Mono', monospace;
+}
+html[data-theme="skeuomorphic"] .files-drop { border-color: var(--sk-metal-4); background: rgba(0,0,0,0.15); }
+html[data-theme="skeuomorphic"] .files-drop.drag-active { border-color: var(--accent); background: var(--accent-dim); }
+html[data-theme="skeuomorphic"] .files-pick-btn { color: var(--sk-metal-4); }
+html[data-theme="skeuomorphic"] .files-row { border-bottom-color: rgba(0,0,0,0.3); }
+html[data-theme="skeuomorphic"] .music-url-row input {
+  background: var(--sk-vfd-bg); border: 2px solid var(--sk-metal-4); color: var(--sk-vfd-text);
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.8); font-family: 'JetBrains Mono', monospace;
+}
+html[data-theme="skeuomorphic"] .music-player-bar { border-top-color: var(--sk-metal-4); background: var(--sk-metal-3); }
+
+html[data-theme="skeuomorphic"] #image-viewer-close { color: var(--sk-metal-4); }
+
+/* ---------- Composer: leather instrument tray ---------- */
+html[data-theme="skeuomorphic"] #composer-wrap {
+  background:
+    repeating-linear-gradient(115deg, rgba(0,0,0,0.08) 0 1px, transparent 1px 3px),
+    linear-gradient(180deg, var(--sk-leather), var(--sk-leather-2));
+  border-top: 3px solid var(--sk-metal-4);
+  box-shadow: inset 0 6px 12px -8px rgba(0,0,0,0.7);
+}
+html[data-theme="skeuomorphic"] #input {
+  background: var(--sk-vfd-bg); border: 2px solid var(--sk-metal-4); color: var(--sk-vfd-text);
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.8); font-family: 'JetBrains Mono', monospace;
+  border-radius: 10px;
+}
+html[data-theme="skeuomorphic"] #input::placeholder { color: rgba(255,180,84,0.4); }
+html[data-theme="skeuomorphic"] #input:focus { border-color: var(--accent); box-shadow: inset 0 2px 6px rgba(0,0,0,0.8), 0 0 0 2px var(--accent-dim); }
+html[data-theme="skeuomorphic"] .icon-btn.recording {
+  background: linear-gradient(180deg, #ff8f87, var(--danger)); color: #3a0a07; border-color: #7a201a;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.4), 0 0 10px rgba(224,82,74,0.5);
+}
+html[data-theme="skeuomorphic"] .attach-chip {
+  background: var(--sk-metal-3); border: 1px solid var(--sk-metal-4); box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+}
+html[data-theme="skeuomorphic"] #model-picker-bar { color: var(--sk-metal-1); }

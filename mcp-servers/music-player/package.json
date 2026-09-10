@@ -1,0 +1,10 @@
+{
+  "name": "music-player",
+  "version": "1.0.0",
+  "description": "MCP server exposing tools to download audio from a video link into the app's music library and start playback in the user's open browser tab.",
+  "main": "server.js",
+  "license": "ISC",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0"
+  }
+}

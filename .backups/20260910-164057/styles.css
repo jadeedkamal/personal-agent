@@ -142,7 +142,6 @@ a:hover { color: var(--accent-strong); }
 .convo-row .time { font-size: 11.5px; color: var(--muted); margin-top: 1px; }
 .convo-row .row-actions { display: flex; gap: 2px; flex-shrink: 0; opacity: 0; transition: opacity .12s; }
 .convo-row:hover .row-actions { opacity: 1; }
-@media (hover: none) { .convo-row .row-actions { opacity: 1; } }
 .convo-row .row-actions button { padding: 4px; border-radius: 6px; color: var(--muted); }
 .convo-row .row-actions button:hover { background: var(--border); color: var(--text); }
 .convo-row .title-input {
@@ -153,15 +152,8 @@ a:hover { color: var(--accent-strong); }
   position: relative; padding: 12px 16px; border-top: 1px solid var(--border); font-size: 11.5px; color: var(--muted);
   display: flex; align-items: center; justify-content: space-between; gap: 8px;
 }
-#theme-btn, #settings-btn, #design-studio-btn { padding: 6px; border-radius: 8px; color: var(--muted); display: flex; flex-shrink: 0; }
-#theme-btn:hover, #settings-btn:hover, #design-studio-btn:hover { background: var(--border); color: var(--text); }
-#design-studio-preview { width: 100%; max-height: 160px; object-fit: cover; border-radius: 10px; margin: 10px 0; display: block; }
-#design-studio-notes {
-  width: 100%; box-sizing: border-box; padding: 10px 12px; border-radius: 9px; font-size: 13.5px;
-  background: var(--panel-2); border: 1px solid var(--border); color: var(--text); font-family: inherit; resize: vertical; margin-top: 4px;
-}
-#design-studio-notes:focus { outline: none; border-color: var(--accent); }
-.secure-input-btn:disabled { opacity: 0.5; cursor: default; }
+#theme-btn, #settings-btn { padding: 6px; border-radius: 8px; color: var(--muted); display: flex; flex-shrink: 0; }
+#theme-btn:hover, #settings-btn:hover { background: var(--border); color: var(--text); }
 #theme-menu {
   position: absolute; bottom: calc(100% + 6px); left: 12px; right: 12px; z-index: 5;
   background: var(--panel-2); border: 1px solid var(--border); border-radius: 10px; padding: 5px;
@@ -371,7 +363,7 @@ a:hover { color: var(--accent-strong); }
 .secure-input-btn-primary { background: var(--accent); color: white; }
 .secure-input-btn-secondary { background: var(--panel-2); color: var(--text); border: 1px solid var(--border); }
 
-#files-modal, #design-studio-modal {
+#files-modal {
   position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 50;
   display: flex; align-items: center; justify-content: center; padding: 20px;
 }

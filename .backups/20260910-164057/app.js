@@ -187,7 +187,6 @@ async function openSettings() {
       <select class="settings-select">
         <option value="claude">Claude CLI</option>
         <option value="antigravity">Antigravity CLI</option>
-        <option value="codex">Codex CLI</option>
       </select>`;
     const engineSelect = engineRow.querySelector('select');
     engineSelect.value = appSettings.provider || 'claude';
@@ -296,97 +295,6 @@ filesDrop.addEventListener('drop', async (e) => {
   if (e.dataTransfer.files && e.dataTransfer.files.length) await uploadToFileStore(e.dataTransfer.files);
 });
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !settingsModal.hidden) closeSettings(); });
-
-// ---------------- Create Design (theme from a reference photo) ----------------
-
-const designStudioBtn = $('#design-studio-btn');
-const designStudioModal = $('#design-studio-modal');
-const designStudioDrop = $('#design-studio-drop');
-const designStudioDropLabel = $('#design-studio-drop-label');
-const designStudioPickBtn = $('#design-studio-pick-btn');
-const designStudioInput = $('#design-studio-input');
-const designStudioPreview = $('#design-studio-preview');
-const designStudioNotes = $('#design-studio-notes');
-const designStudioGenerate = $('#design-studio-generate');
-
-let designStudioFile = null;
-
-function openDesignStudio() { designStudioModal.hidden = false; themeMenu.hidden = true; }
-function closeDesignStudio() { designStudioModal.hidden = true; }
-
-function setDesignStudioFile(file) {
-  if (!file || !file.type.startsWith('image/')) return;
-  designStudioFile = file;
-  designStudioPreview.src = URL.createObjectURL(file);
-  designStudioPreview.hidden = false;
-  designStudioDropLabel.textContent = file.name;
-  designStudioGenerate.disabled = false;
-}
-
-designStudioBtn.addEventListener('click', openDesignStudio);
-$('#design-studio-close').addEventListener('click', closeDesignStudio);
-designStudioModal.addEventListener('click', (e) => { if (e.target === designStudioModal) closeDesignStudio(); });
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !designStudioModal.hidden) closeDesignStudio(); });
-
-designStudioPickBtn.addEventListener('click', () => designStudioInput.click());
-designStudioInput.addEventListener('change', () => {
-  if (designStudioInput.files[0]) setDesignStudioFile(designStudioInput.files[0]);
-});
-designStudioDrop.addEventListener('dragover', (e) => { e.preventDefault(); designStudioDrop.classList.add('drag-active'); });
-designStudioDrop.addEventListener('dragleave', () => designStudioDrop.classList.remove('drag-active'));
-designStudioDrop.addEventListener('drop', (e) => {
-  e.preventDefault();
-  designStudioDrop.classList.remove('drag-active');
-  if (e.dataTransfer.files[0]) setDesignStudioFile(e.dataTransfer.files[0]);
-});
-
-function buildDesignBrief(notes) {
-  return `Design and deploy a brand-new UI theme for this app, based on the attached reference photo — follow the exact process and standard used for the existing "Skeuomorphic" and "Neo-brutalism" themes:
-
-1. Look at the reference photo. Identify the concrete subject/material/mood in it (don't default to a generic palette) and ground every design choice in what's actually in the photo.
-2. Work in two passes. First plan: a compact token system — 4-6 named hex colors pulled or inspired from the photo, 1-2 typefaces and their roles (reuse Space Grotesk / Manrope / JetBrains Mono already loaded unless the photo strongly justifies a different Google Font), a layout/material concept (what makes surfaces, buttons, and depth look like they belong to this photo's world), and 2-3 principles.
-3. Review that plan against the known generic AI-design tells before building (warm cream + terracotta; near-black + single neon accent; identical rounded cards with the same soft grey shadow everywhere; tracked-out ALL-CAPS labels) — revise anything that reads as a generic default rather than a choice earned by this specific photo.
-4. Build it as a new file \`public/theme-<kebab-case-id>.css\`, following the exact structure of \`public/theme-skeuomorphic.css\` (read it first) — every rule scoped under \`html[data-theme="<id>"]\`, covering the same component checklist (login, sidebar, header, live-desktop panel, message bubbles, tool-feed, modals, composer, buttons in raised/pressed states appropriate to this material).
-5. Register it: add \`{ id: '<id>', label: '<Display Name>', swatch: '#hex' }\` to the \`THEMES\` array in \`public/app.js\`, and add \`<link rel="stylesheet" href="/theme-<id>.css" />\` in \`public/index.html\` alongside the other theme stylesheets.
-6. Bump the \`CACHE\` version constant in \`public/sw.js\` by one so browsers actually pick up the change.
-7. Restart the agent-app service so it's live (this will briefly disconnect this session — expected).
-8. Reply with the theme's display name and one line on the design choice you made and why.
-
-${notes ? `Notes from the user: ${notes}` : ''}`.trim();
-}
-
-designStudioGenerate.addEventListener('click', async () => {
-  if (!designStudioFile || designStudioGenerate.disabled) return;
-  designStudioGenerate.disabled = true;
-  designStudioGenerate.textContent = 'Uploading…';
-  try {
-    const form = new FormData();
-    form.append('file', designStudioFile);
-    const r = await fetch('/api/upload', { method: 'POST', body: form });
-    if (!r.ok) throw new Error('upload failed');
-    const uploaded = await r.json();
-
-    const notes = designStudioNotes.value.trim();
-    closeDesignStudio();
-    designStudioFile = null;
-    designStudioPreview.hidden = true;
-    designStudioNotes.value = '';
-    designStudioDropLabel.textContent = 'Drag a photo here, or';
-    designStudioGenerate.disabled = true;
-    designStudioGenerate.textContent = 'Generate & deploy';
-
-    startNewChat('improve');
-    pendingFiles = [{ ...uploaded, previewUrl: null }];
-    renderPendingAttachments();
-    input.value = buildDesignBrief(notes);
-    input.dispatchEvent(new Event('input'));
-    send();
-  } catch {
-    designStudioGenerate.disabled = false;
-    designStudioGenerate.textContent = 'Generate & deploy';
-    alert('Could not upload the reference photo. Try again.');
-  }
-});
 
 // ---------------- Music (paste a link, download as mp3, play) ----------------
 
@@ -506,7 +414,6 @@ const THEMES = [
   { id: 'sunset', label: 'Sunset', swatch: '#ff7850' },
   { id: 'skeuomorphic', label: 'Skeuomorphic', swatch: '#e8a33d' },
   { id: 'neobrutalism', label: 'Neo-brutalism', swatch: '#ff4d8f' },
-  { id: 'clay', label: 'Claymorphism', swatch: '#17423f' },
 ];
 const themeBtn = $('#theme-btn');
 const themeMenu = $('#theme-menu');

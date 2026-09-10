@@ -14,7 +14,6 @@ const PUSH_SUBS_FILE = path.join(DATA_DIR, 'push-subscriptions.json');
 const RATE_LIMIT_FILE = path.join(DATA_DIR, 'rate-limit.json');
 const APP_SETTINGS_FILE = path.join(DATA_DIR, 'app-settings.json');
 const ANTIGRAVITY_BIN = path.join(os.homedir(), '.local/bin/agy');
-const CODEX_BIN = path.join(os.homedir(), '.local/bin/codex');
 const CLAUDE_MEMORY_FILE = path.join(os.homedir(), '.claude/projects/-home-personalagent-agent-app/memory/MEMORY.md');
 const WORKSPACE = process.env.AGENT_WORKSPACE || path.join(os.homedir(), 'workspace');
 const UPLOADS_DIR = path.join(WORKSPACE, 'uploads');
@@ -113,21 +112,11 @@ const MODEL_CATALOG = {
     { id: 'gemini-3.6-flash-medium', label: 'Gemini 3.6 Flash (Medium)' },
     { id: 'gemini-3.6-flash-low', label: 'Gemini 3.6 Flash (Low)' },
   ],
-  codex: [
-    { id: 'gpt-5.1-codex', label: 'GPT-5.1 Codex' },
-    { id: 'gpt-5.1-codex:high', label: 'GPT-5.1 Codex (High reasoning)' },
-    { id: 'gpt-5.1-codex-mini', label: 'GPT-5.1 Codex Mini' },
-    { id: 'gpt-5-codex', label: 'GPT-5 Codex' },
-  ],
 };
 
 const DEFAULT_APP_SETTINGS = {
   provider: 'claude',
-  model: {
-    claude: MODEL_CATALOG.claude[0].id,
-    antigravity: MODEL_CATALOG.antigravity[0].id,
-    codex: MODEL_CATALOG.codex[0].id,
-  },
+  model: { claude: MODEL_CATALOG.claude[0].id, antigravity: MODEL_CATALOG.antigravity[0].id },
 };
 
 function loadAppSettings() {
@@ -698,49 +687,21 @@ function restartIfPending() {
 const APP_DIR = __dirname;
 const IMPROVE_SYSTEM_PROMPT = `You are operating in "Improve" mode: your working directory is the source code of the very app the user is talking to you through (Personal Agent), not their general workspace.
 
-Read ${APP_DIR}/docs/ARCHITECTURE.md before making non-trivial changes — it has the full layout, the multi-provider abstraction, the virtual desktop/secure-input/graceful-restart mechanisms, and known gotchas. Read ${APP_DIR}/docs/FEATURES.md and ${APP_DIR}/docs/DECISIONS.md for what's already shipped and why past choices were made, so you don't rebuild or contradict them. Update ${APP_DIR}/docs/CHANGELOG.md (and FEATURES.md/ARCHITECTURE.md/DECISIONS.md as relevant) after you ship something.
+Layout:
+- ${APP_DIR}/server.js — Express backend (auth, conversation storage, SSE streaming to the claude CLI, uploads)
+- ${APP_DIR}/public/ — frontend (index.html, app.js, styles.css, manifest.json, sw.js, vendor/marked.js)
+- ${APP_DIR}/config/mcp.json — MCP server config loaded by every claude invocation
+- ~/mcp-servers/gui-control/server.js — the MCP server exposing GUI control tools (screenshot, click, type_text, etc.)
+- Systemd services you may restart after changes: agent-app (this backend — restarting it WILL drop your own current connection, that's expected), xvfb / xfce / x11vnc / novnc (virtual desktop stack), caddy (reverse proxy + TLS, config at /etc/caddy/Caddyfile)
 
 Ground rules:
-- This is the user's only interface to this machine. Never leave it broken: sanity-check syntax (node -c for JS) before restarting, and prefer small, testable changes over big rewrites.
-- Never remove or weaken the login/session auth, never expose secrets (any CLI's OAuth token, session secret, password hash, shared secrets) in code you write or logs.
-- Prefer the restart_agent_app MCP tool over a raw "systemctl restart agent-app" — it defers the restart until your current response has fully finished sending, instead of cutting your own reply off mid-sentence. Other services (xvfb/xfce/x11vnc/novnc/caddy/whatsapp-bridge) can be restarted directly via systemctl.
-- Report what changed and why after any restart, regardless of which mechanism triggered it.
-- If a change is destructive, irreversible, or touches security/auth, explain the tradeoff in your reply rather than assuming.
-- Before overwriting a file outside this conversation's own edits (e.g. deploying from a separate tool/session), re-read the live file first — another Improve-mode session may have changed it since you last read it.`;
+- This is the user's only interface to this machine. Never leave it broken: after editing server.js or frontend files, sanity-check syntax (node -c for JS) before restarting the service, and prefer small, testable changes over big rewrites.
+- Never remove or weaken the login/session auth, never expose secrets (the OAuth token, session secret, password hash) in code you write or logs.
+- After a change that requires a restart, restart the specific affected service(s) yourself and briefly report what changed and why.
+- If a change is destructive, irreversible, or touches security/auth, explain the tradeoff in your reply rather than assuming.`;
 
 function readClaudeMemorySummary() {
   try { return fs.readFileSync(CLAUDE_MEMORY_FILE, 'utf8').slice(0, 4000); } catch { return null; }
-}
-
-// ---------- Persistent memory (provider-agnostic) ----------
-//
-// Two separate stores, both plain git-friendly markdown, both living in the app's own repo rather
-// than any one CLI's proprietary memory location (Claude Code's own auto-memory is per-project and
-// invisible to Antigravity/Codex/etc. — see readClaudeMemorySummary() above, which is a one-off
-// shim for that, not a durable solution). This is the durable one:
-//
-//   docs/   — what the app knows about ITSELF: architecture, shipped features, changelog, decisions.
-//             Mainly written during Improve-mode work.
-//   memory/ — what the agent knows about the USER and the ongoing relationship/project: preferences,
-//             feedback, project facts, reference pointers. Written during any conversation.
-//
-// This block is injected into fullPrompt unconditionally, upstream of the provider abstraction
-// (before buildArgs() for whichever provider is active) — so every CLI this app ever drives sees
-// the same memory, without needing its own copy of this logic.
-const DOCS_DIR = path.join(APP_DIR, 'docs');
-const MEMORY_DIR = path.join(APP_DIR, 'memory');
-fs.mkdirSync(DOCS_DIR, { recursive: true });
-fs.mkdirSync(MEMORY_DIR, { recursive: true });
-
-const MEMORY_SYSTEM_PROMPT = `You have two persistent, plain-markdown knowledge stores in your working tree — both are how you stay self-aware and consistent across turns, across conversations, and regardless of which underlying CLI/model is answering:
-
-- ${DOCS_DIR}/ — what THIS APP is: ARCHITECTURE.md, FEATURES.md, CHANGELOG.md, DECISIONS.md. Read the relevant one before making non-trivial changes (especially in Improve mode). After you ship a feature, fix, or structural change: update CHANGELOG.md (one dated entry) and FEATURES.md (if it's user-facing), and ARCHITECTURE.md/DECISIONS.md if the structure or a real tradeoff changed. Don't restate what's obvious from reading the code itself.
-- ${MEMORY_DIR}/ — what you know about the USER and this ongoing project: preferences, corrections/feedback, project facts, reference pointers. ${MEMORY_DIR}/MEMORY.md is a short index (one line per note) and is always shown to you below when it has content — read the linked file only when you need the detail. When you learn something durable — a stated preference, a correction, a project fact worth remembering, where something lives — add or update a note under ${MEMORY_DIR}/ and its one-line entry in MEMORY.md. Keep MEMORY.md entries under ~150 characters each. Don't log ephemeral task details or anything already derivable from the code — only what would be lost otherwise.
-
-Update these as a normal part of doing the work, not as a separate step to remember later.`;
-
-function readMemoryIndex() {
-  try { return fs.readFileSync(path.join(MEMORY_DIR, 'MEMORY.md'), 'utf8').slice(0, 6000); } catch { return null; }
 }
 
 // ---------- CLI engine backends ----------
@@ -898,144 +859,6 @@ const PROVIDERS = {
       }
     },
   },
-  codex: {
-    command: CODEX_BIN,
-    // `codex exec --json` schema (very different shape from the other two): no incremental text
-    // deltas — an `agent_message` item only appears once, fully formed, in its `item.completed`
-    // event — and session ids are system-generated (from `thread.started`), same constraint as
-    // Antigravity's `--conversation`. `-c model_reasoning_effort=<x>` is how effort is set (no
-    // separate flag), so a model id here may be `<model>:<effort>` and gets split back apart.
-    // `--dangerously-bypass-approvals-and-sandbox` matches the full-machine-access posture already
-    // used for Claude (`bypassPermissions`) and Antigravity (`--dangerously-skip-permissions`).
-    // `--skip-git-repo-check` because workspace-mode's cwd (~/workspace) isn't a git repo.
-    buildArgs({ fullPrompt, isResume, model, nativeConversationId }) {
-      const args = ['exec'];
-      if (isResume && nativeConversationId) args.push('resume', nativeConversationId);
-      args.push('--json', '--skip-git-repo-check', '--dangerously-bypass-approvals-and-sandbox');
-      if (model) {
-        const [modelId, effort] = model.split(':');
-        args.push('--model', modelId);
-        if (effort) args.push('-c', `model_reasoning_effort=${effort}`);
-      }
-      args.push(fullPrompt);
-      return args;
-    },
-    parseLine(obj, gen, broadcast) {
-      if (obj.type === 'thread.started' && obj.thread_id) {
-        gen.codexThreadId = obj.thread_id;
-        return;
-      }
-      if (obj.type === 'turn.completed') {
-        gen.finalResult = { result: gen.assistantText, usage: obj.usage };
-        return;
-      }
-      if (obj.type === 'turn.failed') {
-        gen.stderrBuf += (obj.error && obj.error.message) || 'codex turn failed';
-        return;
-      }
-      if (obj.type === 'error') {
-        gen.stderrBuf += obj.message || 'codex stream error';
-        return;
-      }
-      if (obj.type !== 'item.started' && obj.type !== 'item.completed') return;
-      const item = obj.item;
-      if (!item) return;
-
-      if (item.type === 'reasoning') {
-        if (obj.type === 'item.started' && !gen.usedThinking) {
-          gen.usedThinking = true;
-          broadcast('thinking_start', {});
-        }
-        return;
-      }
-
-      if (item.type === 'agent_message') {
-        if (obj.type === 'item.completed' && item.text) {
-          gen.assistantText += item.text;
-          if (!gen.currentBlock || gen.currentBlock.type !== 'text') {
-            gen.currentBlock = { type: 'text', text: '' };
-            gen.blocks.push(gen.currentBlock);
-          }
-          gen.currentBlock.text += item.text;
-          broadcast('text_delta', { text: item.text });
-        }
-        return;
-      }
-
-      const startToolBlock = (id, name, input) => {
-        const meta = { id, name, input: input || null, done: false, images: [] };
-        gen.toolMeta.set(id, meta);
-        if (!gen.currentBlock || gen.currentBlock.type !== 'tools') {
-          gen.currentBlock = { type: 'tools', tools: [] };
-          gen.blocks.push(gen.currentBlock);
-        }
-        gen.currentBlock.tools.push(meta);
-        broadcast('tool_start', { id, name });
-        broadcast('tool_input', { id, name, input: meta.input });
-        return meta;
-      };
-
-      if (item.type === 'command_execution') {
-        if (obj.type === 'item.started') {
-          startToolBlock(item.id, 'shell', { command: item.command });
-        } else {
-          const meta = gen.toolMeta.get(item.id);
-          if (meta) meta.done = true;
-          broadcast('tool_result', {
-            id: item.id,
-            isError: item.exit_code != null && item.exit_code !== 0,
-            summary: String(item.aggregated_output || '').slice(0, 4000),
-            images: [],
-          });
-        }
-        return;
-      }
-
-      if (item.type === 'mcp_tool_call') {
-        if (obj.type === 'item.started') {
-          startToolBlock(item.id, `${item.server}.${item.tool}`, item.arguments);
-        } else {
-          const meta = gen.toolMeta.get(item.id);
-          if (meta) meta.done = true;
-          let resultText = '';
-          const images = [];
-          const content = (item.result && Array.isArray(item.result.content)) ? item.result.content : [];
-          for (const part of content) {
-            if (part.type === 'text') {
-              resultText += part.text;
-            } else if (part.type === 'image' && part.data) {
-              const ext = (part.mimeType || 'image/png').split('/')[1] || 'png';
-              const fname = `${crypto.randomUUID()}.${ext}`;
-              fs.writeFileSync(path.join(TOOL_IMAGES_DIR, fname), Buffer.from(part.data, 'base64'));
-              images.push({ url: `/tool-images/${fname}`, mediaType: part.mimeType });
-            }
-          }
-          if (meta) meta.images = images;
-          broadcast('tool_result', {
-            id: item.id,
-            isError: !!item.error,
-            summary: resultText.slice(0, 4000) || (item.error ? String(item.error) : ''),
-            images,
-          });
-        }
-        return;
-      }
-
-      // file_change/web_search only ever arrive as a single `item.completed` (no separate
-      // started/done pair), so start-and-finish the tool block in one shot.
-      if (item.type === 'file_change' && obj.type === 'item.completed') {
-        const changes = item.changes || [];
-        startToolBlock(item.id, 'file_change', { changes }).done = true;
-        broadcast('tool_result', {
-          id: item.id, isError: false,
-          summary: changes.map(c => `${c.kind} ${c.path}`).join('\n').slice(0, 4000), images: [],
-        });
-      } else if (item.type === 'web_search' && obj.type === 'item.completed') {
-        startToolBlock(item.id, 'web_search', { query: item.query }).done = true;
-        broadcast('tool_result', { id: item.id, isError: false, summary: item.query || '', images: [] });
-      }
-    },
-  },
 };
 
 app.post('/api/chat/stream', requireAuth, (req, res) => {
@@ -1082,26 +905,12 @@ app.post('/api/chat/stream', requireAuth, (req, res) => {
     const list = attachments.map(a => `- ${path.join(WORKSPACE, a.relativePath)} (${a.filename})`).join('\n');
     fullPrompt += `\n\n[Attached files]\n${list}`;
   }
-  // Provider-agnostic persistent memory — injected unconditionally, upstream of buildArgs(), so
-  // every CLI this app drives (claude, antigravity, and whatever's added later) sees the same
-  // memory without needing its own copy of this logic. Only the first turn of a conversation needs
-  // it spelled out in full; a resumed turn on the SAME provider already has it in native history.
-  if (!isResume || switchedProvider) {
-    const memoryIndex = readMemoryIndex();
-    let preamble = MEMORY_SYSTEM_PROMPT;
-    if (memoryIndex) preamble += `\n\n[Current memory index — ${MEMORY_DIR}/MEMORY.md]\n${memoryIndex}`;
-    fullPrompt = `${preamble}\n\n${fullPrompt}`;
-  }
   if (switchedProvider) {
     const transcript = convos[convoId].messages.map(m => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.text}`).join('\n\n');
     fullPrompt = `[Continuing an existing conversation previously handled by a different AI CLI/model. Prior conversation, for context:]\n\n${transcript}\n\n[End of prior context — continue naturally from here.]\n\n${fullPrompt}`;
   }
-  // Only Claude has a real --append-system-prompt; every other engine gets the improve-mode
-  // instructions prepended into the prompt text itself instead.
-  if (providerName !== 'claude' && convoMode === 'improve') {
-    fullPrompt = `${IMPROVE_SYSTEM_PROMPT}\n\n${fullPrompt}`;
-  }
   if (providerName === 'antigravity') {
+    if (convoMode === 'improve') fullPrompt = `${IMPROVE_SYSTEM_PROMPT}\n\n${fullPrompt}`;
     const memory = readClaudeMemorySummary();
     if (memory) fullPrompt = `[Shared memory notes carried over from the Claude-side agent, for context:]\n${memory}\n\n${fullPrompt}`;
   }
@@ -1118,26 +927,16 @@ app.post('/api/chat/stream', requireAuth, (req, res) => {
     'X-Accel-Buffering': 'no',
   });
 
-  // Only Antigravity and Codex generate their own session id server-side (Claude accepts an
-  // arbitrary client-chosen one via --session-id, so it never needs this).
-  const nativeConversationId = providerName === 'antigravity' ? convos[convoId].antigravityConversationId
-    : providerName === 'codex' ? convos[convoId].codexThreadId
-    : undefined;
-
   const args = provider.buildArgs({
     fullPrompt,
     isResume: isResume && !switchedProvider,
     convoId,
     convoMode,
     model,
-    nativeConversationId,
+    nativeConversationId: convos[convoId].antigravityConversationId,
   });
 
-  // stdin explicitly closed (not just unwritten): Codex CLI checks whether stdin is piped and, if
-  // so, blocks waiting to read it before doing anything — an open-but-silent pipe (Node's default
-  // when stdio isn't specified) hangs it forever instead of proceeding. Confirmed with `codex exec`
-  // directly: identical invocation never even reaches `thread.started` without this.
-  const child = spawn(provider.command, args, { cwd, env: process.env, stdio: ['ignore', 'pipe', 'pipe'] });
+  const child = spawn(provider.command, args, { cwd, env: process.env });
 
   const gen = {
     child,
@@ -1148,7 +947,6 @@ app.post('/api/chat/stream', requireAuth, (req, res) => {
     toolMeta: new Map(), // tool_use id -> same object referenced inside blocks
     finalResult: null,
     antigravityConversationId: null,
-    codexThreadId: null,
     stderrBuf: '',
     subscribers: new Set([res]),
   };
@@ -1191,7 +989,6 @@ app.post('/api/chat/stream', requireAuth, (req, res) => {
       });
       convosNow[convoId].updatedAt = Date.now();
       if (gen.antigravityConversationId) convosNow[convoId].antigravityConversationId = gen.antigravityConversationId;
-      if (gen.codexThreadId) convosNow[convoId].codexThreadId = gen.codexThreadId;
       saveConvos(convosNow);
 
       if (isError) {

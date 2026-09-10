@@ -1,4 +1,4 @@
-const CACHE = 'agent-shell-v14';
+const CACHE = 'agent-shell-v11';
 const SHELL = ['/', '/styles.css', '/app.js', '/vendor/marked.js', '/manifest.json'];
 
 self.addEventListener('install', (e) => {

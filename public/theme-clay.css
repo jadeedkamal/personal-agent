@@ -1,0 +1,333 @@
+/* ==========================================================================
+   Clay theme — "Foundations Sheet"
+   Warm cream clay (base/raised/inset/pressed layers, exactly as spec'd in
+   the reference design-system sheet) + dark teal primary + amber warning
+   accent. Adds material/depth on top of the existing token system; does
+   not touch styles.css or any behavior/markup.
+   ========================================================================== */
+
+html[data-theme="clay"] {
+  color-scheme: light;
+  --bg: #eae2d0; --panel: #f5efe0; --panel-2: #ddd3ba; --border: #c7ba9c;
+  --text: #332a1f; --muted: #8f8371; --muted-2: #b3a88f;
+  --accent: #17423f; --accent-strong: #1f5751; --accent-dim: rgba(23,66,63,0.14);
+  --online: #4e8b5c; --working: #d79a3c; --danger: #b5483a;
+  --user-bubble: #1f5751; --assistant-bubble: #f5efe0;
+
+  --cl-base: #eae2d0; --cl-raised: #f6f0e1; --cl-inset: #ddd3ba; --cl-pressed: #cabf9f;
+  --cl-hi: rgba(255,255,255,0.7); --cl-sh: rgba(117,99,61,0.32);
+  --cl-shadow-raised: 6px 6px 14px var(--cl-sh), -6px -6px 14px var(--cl-hi);
+  --cl-shadow-raised-sm: 3px 3px 8px var(--cl-sh), -3px -3px 8px var(--cl-hi);
+  --cl-shadow-inset: inset 4px 4px 9px var(--cl-sh), inset -4px -4px 9px var(--cl-hi);
+  --cl-shadow-pressed: inset 3px 3px 7px var(--cl-sh), inset -2px -2px 5px var(--cl-hi);
+  --cl-shadow-modal: 0 24px 60px rgba(51,41,25,0.35), 8px 8px 20px var(--cl-sh);
+  --cl-font-display: 'Space Grotesk', -apple-system, sans-serif;
+  --cl-font-body: 'Manrope', -apple-system, sans-serif;
+}
+
+html[data-theme="clay"] body {
+  font-family: var(--cl-font-body);
+  color: var(--text);
+  background:
+    radial-gradient(ellipse at 50% -10%, rgba(255,255,255,0.4), transparent 55%),
+    linear-gradient(180deg, #eee7d7, var(--cl-base));
+}
+
+html[data-theme="clay"] #header-title,
+html[data-theme="clay"] #sidebar .brand span,
+html[data-theme="clay"] .empty-state h2,
+html[data-theme="clay"] .convo-row .title,
+html[data-theme="clay"] .settings-header span,
+html[data-theme="clay"] #login-screen h1,
+html[data-theme="clay"] .files-drop span {
+  font-family: var(--cl-font-display);
+}
+
+/* Meta/annotation labels get the reference sheet's own tracked-caps
+   spec-label treatment (FOUNDATIONS, CONTROLS, NAVIGATION...) — reserved
+   for these small labels only, not applied to buttons or nav items. */
+html[data-theme="clay"] .convo-section-label,
+html[data-theme="clay"] .tool-feed-header .label,
+html[data-theme="clay"] .settings-header span {
+  text-transform: uppercase; letter-spacing: 0.08em; font-size: 11px; color: var(--muted);
+}
+
+/* Raised-clay recipe, reused by every physical control */
+html[data-theme="clay"] .cl-raised,
+html[data-theme="clay"] #new-chat-btn,
+html[data-theme="clay"] #improve-btn,
+html[data-theme="clay"] #google-signin-btn,
+html[data-theme="clay"] #login-form button,
+html[data-theme="clay"] .icon-btn,
+html[data-theme="clay"] #send-btn,
+html[data-theme="clay"] #live-desktop-btn,
+html[data-theme="clay"] #notif-btn,
+html[data-theme="clay"] #theme-btn,
+html[data-theme="clay"] #settings-btn,
+html[data-theme="clay"] #history-toggle-btn,
+html[data-theme="clay"] .files-pick-btn,
+html[data-theme="clay"] .secure-input-btn,
+html[data-theme="clay"] #image-viewer-close {
+  background: var(--cl-raised);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--cl-shadow-raised-sm);
+  color: var(--text);
+  transition: transform .08s ease, box-shadow .08s ease;
+}
+html[data-theme="clay"] .cl-raised:hover,
+html[data-theme="clay"] #new-chat-btn:hover,
+html[data-theme="clay"] #improve-btn:hover,
+html[data-theme="clay"] #google-signin-btn:hover,
+html[data-theme="clay"] .icon-btn:hover,
+html[data-theme="clay"] #history-toggle-btn:hover,
+html[data-theme="clay"] .files-pick-btn:hover {
+  box-shadow: var(--cl-shadow-raised);
+}
+html[data-theme="clay"] .cl-raised:active,
+html[data-theme="clay"] #new-chat-btn:active,
+html[data-theme="clay"] #improve-btn:active,
+html[data-theme="clay"] .icon-btn:active,
+html[data-theme="clay"] #send-btn:active,
+html[data-theme="clay"] #live-desktop-btn:active,
+html[data-theme="clay"] .secure-input-btn:active {
+  transform: translateY(1px);
+  box-shadow: var(--cl-shadow-pressed);
+}
+
+/* Primary (teal) buttons — same clay recipe, teal fill like the reference's
+   "Submit Now" button and alert banner */
+html[data-theme="clay"] #new-chat-btn,
+html[data-theme="clay"] #send-btn,
+html[data-theme="clay"] #login-form button,
+html[data-theme="clay"] .secure-input-btn-primary {
+  background: linear-gradient(180deg, var(--accent-strong), var(--accent));
+  color: #f2ede0;
+  border-color: #0f2e2b;
+  box-shadow: var(--cl-shadow-raised-sm), inset 0 1px 0 rgba(255,255,255,0.12);
+}
+html[data-theme="clay"] #new-chat-btn:hover,
+html[data-theme="clay"] #send-btn:hover {
+  background: linear-gradient(180deg, #24645d, var(--accent-strong));
+}
+html[data-theme="clay"] #send-btn.stop {
+  background: linear-gradient(180deg, #c5594a, var(--danger)); border-color: #6e2a20; color: #fbe9e5;
+}
+
+html[data-theme="clay"] #improve-btn:hover { color: var(--accent); border-color: var(--accent); }
+
+/* Icon-only round controls read as inset dials */
+html[data-theme="clay"] .icon-btn,
+html[data-theme="clay"] #live-desktop-btn,
+html[data-theme="clay"] #notif-btn,
+html[data-theme="clay"] #theme-btn,
+html[data-theme="clay"] #settings-btn,
+html[data-theme="clay"] #image-viewer-close {
+  border-radius: 999px;
+}
+html[data-theme="clay"] .icon-btn.active,
+html[data-theme="clay"] #live-desktop-btn.active,
+html[data-theme="clay"] #notif-btn.active {
+  background: linear-gradient(180deg, var(--accent-strong), var(--accent));
+  color: #f2ede0; border-color: #0f2e2b;
+  box-shadow: var(--cl-shadow-pressed);
+}
+
+/* ---------- Login ---------- */
+html[data-theme="clay"] #login-screen {
+  background:
+    radial-gradient(ellipse at 50% 20%, rgba(255,255,255,0.5), transparent 55%),
+    linear-gradient(180deg, #eee7d7, var(--cl-base));
+}
+html[data-theme="clay"] #login-screen h1 { color: var(--text); }
+html[data-theme="clay"] #login-screen h1 svg { color: var(--accent); }
+html[data-theme="clay"] #login-form input {
+  background: var(--cl-inset); border: 2px solid var(--border); color: var(--text);
+  border-radius: 8px; box-shadow: var(--cl-shadow-inset);
+}
+html[data-theme="clay"] #login-form input::placeholder { color: var(--muted); }
+html[data-theme="clay"] #google-signin-btn { color: var(--text); font-family: var(--cl-font-body); }
+
+/* ---------- Sidebar ---------- */
+html[data-theme="clay"] #sidebar {
+  background: linear-gradient(180deg, #efe8d8, #e5ddc9);
+  border-right: 2px solid var(--border);
+}
+html[data-theme="clay"] #sidebar .brand .logo,
+html[data-theme="clay"] .empty-state .logo {
+  background: linear-gradient(180deg, var(--accent-strong), var(--accent));
+  border-radius: 12px;
+  box-shadow: var(--cl-shadow-raised-sm), inset 0 1px 0 rgba(255,255,255,0.15);
+  border: 1px solid #0f2e2b;
+}
+html[data-theme="clay"] #sidebar .brand .logo svg,
+html[data-theme="clay"] .empty-state .logo svg { stroke: #f2ede0 !important; }
+
+html[data-theme="clay"] .search-box {
+  background: var(--cl-inset); border: 2px solid var(--border);
+  border-radius: 10px; box-shadow: var(--cl-shadow-inset);
+}
+html[data-theme="clay"] .search-box input { color: var(--text); }
+html[data-theme="clay"] .search-box input::placeholder { color: var(--muted); }
+html[data-theme="clay"] .search-box svg { color: var(--muted); }
+
+html[data-theme="clay"] .convo-row {
+  border: 1px solid transparent; border-bottom: 1px solid rgba(117,99,61,0.14);
+  border-radius: 8px;
+}
+html[data-theme="clay"] .convo-row:hover { background: rgba(255,255,255,0.35); }
+html[data-theme="clay"] .convo-row.active {
+  background: linear-gradient(180deg, rgba(23,66,63,0.14), rgba(23,66,63,0.05));
+  border: 1px solid rgba(23,66,63,0.3);
+}
+
+html[data-theme="clay"] #sidebar-footer {
+  background: var(--cl-inset);
+  border-top: 1px solid var(--border);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.4);
+  color: var(--muted); font-size: 11px;
+}
+html[data-theme="clay"] #theme-btn, html[data-theme="clay"] #settings-btn,
+html[data-theme="clay"] #files-btn { color: var(--muted); background: none; border: none; box-shadow: none; }
+html[data-theme="clay"] #theme-btn:hover, html[data-theme="clay"] #settings-btn:hover,
+html[data-theme="clay"] #files-btn:hover { color: var(--accent); background: rgba(23,66,63,0.08); }
+html[data-theme="clay"] #theme-menu {
+  background: var(--cl-raised);
+  border: 1px solid var(--border); border-radius: 14px;
+  box-shadow: var(--cl-shadow-modal);
+}
+html[data-theme="clay"] .theme-option { color: var(--text); }
+html[data-theme="clay"] .theme-option:hover { background: rgba(23,66,63,0.08); }
+
+/* ---------- Header ---------- */
+html[data-theme="clay"] #header {
+  background: var(--cl-raised);
+  border-bottom: 2px solid var(--border);
+  box-shadow: 0 2px 10px rgba(117,99,61,0.12);
+}
+html[data-theme="clay"] #header-title { color: var(--text); }
+html[data-theme="clay"] #menu-btn { color: var(--muted); }
+
+html[data-theme="clay"] #status-pill {
+  background: var(--cl-inset); border: 2px solid var(--border);
+  border-radius: 999px; box-shadow: var(--cl-shadow-inset);
+}
+html[data-theme="clay"] #status-pill span.label { color: var(--text); }
+html[data-theme="clay"] #status-pill.online .dot { background: var(--online); box-shadow: 0 0 5px 1px var(--online); }
+html[data-theme="clay"] #status-pill.working .dot { background: var(--working); box-shadow: 0 0 6px 2px var(--working); }
+
+/* ---------- Live desktop / history bar ---------- */
+html[data-theme="clay"] #live-desktop-panel {
+  border: 3px solid var(--border); border-top: none;
+  box-shadow: var(--cl-shadow-inset);
+}
+html[data-theme="clay"] #history-toggle-btn { color: var(--text); }
+
+/* ---------- Messages ---------- */
+html[data-theme="clay"] .empty-state p { font-family: var(--cl-font-body); }
+
+html[data-theme="clay"] .msg-row.user .bubble {
+  background: linear-gradient(180deg, var(--accent-strong), var(--user-bubble));
+  border: 1px solid #0f2e2b;
+  box-shadow: var(--cl-shadow-raised-sm), inset 0 1px 0 rgba(255,255,255,0.12);
+  border-radius: 16px 16px 4px 16px;
+  color: #f2ede0;
+}
+html[data-theme="clay"] .msg-row.assistant .bubble {
+  background: var(--cl-raised);
+  border: 1px solid var(--border);
+  box-shadow: var(--cl-shadow-raised-sm);
+  border-radius: 16px 16px 16px 4px;
+  color: var(--text);
+}
+html[data-theme="clay"] .msg-row.error .bubble {
+  background: #f1ded9; border-color: #d3a598; color: #6e2a20;
+}
+
+html[data-theme="clay"] .bubble code {
+  background: var(--cl-inset); border: 1px solid var(--border); color: var(--text);
+}
+html[data-theme="clay"] .code-block {
+  background: var(--cl-inset); border: 2px solid var(--border);
+  border-radius: 10px; box-shadow: var(--cl-shadow-inset);
+}
+html[data-theme="clay"] .code-block .code-header {
+  background: var(--cl-pressed); color: var(--text); border-bottom-color: var(--border);
+}
+html[data-theme="clay"] .code-block pre { color: var(--text); }
+html[data-theme="clay"] .tok-kw { color: #17423f; font-weight: 600; } html[data-theme="clay"] .tok-str { color: #a8712e; }
+html[data-theme="clay"] .tok-num { color: #6b4f9e; } html[data-theme="clay"] .tok-com { color: var(--muted); }
+
+html[data-theme="clay"] .bubble a.dl-link-btn {
+  background: linear-gradient(180deg, var(--accent-strong), var(--accent)); color: #f2ede0;
+  box-shadow: var(--cl-shadow-raised-sm); border: 1px solid #0f2e2b; border-radius: 10px;
+}
+
+/* Tool feed = inset clay tray, matching the reference's inset panels */
+html[data-theme="clay"] .tool-feed {
+  background: var(--cl-inset); border: 2px solid var(--border);
+  box-shadow: var(--cl-shadow-inset);
+  border-radius: 10px;
+}
+html[data-theme="clay"] .tool-feed-header .label,
+html[data-theme="clay"] .tool-step { color: var(--text); }
+html[data-theme="clay"] .tool-step:not(.running) { opacity: 0.65; }
+html[data-theme="clay"] .tool-feed-body { border-top-color: var(--border); }
+html[data-theme="clay"] .tool-step-thumb, html[data-theme="clay"] .gallery-thumb {
+  border: 1px solid var(--border); box-shadow: var(--cl-shadow-raised-sm); border-radius: 8px;
+}
+
+/* ---------- Modals ---------- */
+html[data-theme="clay"] .settings-card {
+  background: var(--cl-raised);
+  border: 1px solid var(--border); border-radius: 24px;
+  box-shadow: var(--cl-shadow-modal);
+}
+html[data-theme="clay"] .settings-header {
+  background: var(--cl-raised); border-bottom-color: var(--border); color: var(--text);
+}
+html[data-theme="clay"] .settings-row { border-bottom-color: rgba(117,99,61,0.16); }
+html[data-theme="clay"] .settings-select,
+html[data-theme="clay"] #model-select {
+  background: var(--cl-inset); border: 2px solid var(--border); color: var(--text);
+  border-radius: 8px; box-shadow: var(--cl-shadow-inset);
+}
+html[data-theme="clay"] #secure-input-modal .settings-header { border-bottom-color: var(--accent); }
+html[data-theme="clay"] #secure-input-value {
+  background: var(--cl-inset); border: 2px solid var(--border); color: var(--text);
+  border-radius: 8px; box-shadow: var(--cl-shadow-inset);
+}
+html[data-theme="clay"] .files-drop { border-color: var(--border); background: var(--cl-inset); border-radius: 14px; }
+html[data-theme="clay"] .files-drop.drag-active { border-color: var(--accent); background: var(--accent-dim); }
+html[data-theme="clay"] .files-pick-btn { color: var(--text); }
+html[data-theme="clay"] .files-row { border-bottom-color: rgba(117,99,61,0.16); }
+html[data-theme="clay"] .music-url-row input {
+  background: var(--cl-inset); border: 2px solid var(--border); color: var(--text);
+  border-radius: 8px; box-shadow: var(--cl-shadow-inset);
+}
+html[data-theme="clay"] .music-player-bar { border-top-color: var(--border); background: var(--cl-raised); }
+
+html[data-theme="clay"] #image-viewer-close { color: var(--text); }
+
+/* ---------- Composer: raised clay tray ---------- */
+html[data-theme="clay"] #composer-wrap {
+  background: var(--cl-raised);
+  border-top: 2px solid var(--border);
+  box-shadow: 0 -2px 10px rgba(117,99,61,0.1);
+}
+html[data-theme="clay"] #input {
+  background: var(--cl-inset); border: 2px solid var(--border); color: var(--text);
+  box-shadow: var(--cl-shadow-inset);
+  border-radius: 14px;
+}
+html[data-theme="clay"] #input::placeholder { color: var(--muted); }
+html[data-theme="clay"] #input:focus { border-color: var(--accent); box-shadow: var(--cl-shadow-inset), 0 0 0 2px var(--accent-dim); }
+html[data-theme="clay"] .icon-btn.recording {
+  background: linear-gradient(180deg, #c5594a, var(--danger)); color: #fbe9e5; border-color: #6e2a20;
+  box-shadow: var(--cl-shadow-pressed);
+}
+html[data-theme="clay"] .attach-chip {
+  background: var(--cl-inset); border: 1px solid var(--border); border-radius: 8px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.3);
+}
+html[data-theme="clay"] #model-picker-bar { color: var(--muted); }

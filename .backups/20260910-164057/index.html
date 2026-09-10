@@ -21,7 +21,6 @@
 <link rel="stylesheet" href="/styles.css" />
 <link rel="stylesheet" href="/theme-skeuomorphic.css" />
 <link rel="stylesheet" href="/theme-neobrutalism.css" />
-<link rel="stylesheet" href="/theme-clay.css" />
 </head>
 <body>
 
@@ -64,6 +63,7 @@
     </div>
     <div id="convo-list"></div>
     <div id="sidebar-footer">
+      <span>test-agent · 20.44.52.130</span>
       <button id="files-btn" class="btn-reset" title="Files">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
       </button>
@@ -77,9 +77,6 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 3a9 9 0 100 18c1.5 0 2-.8 2-1.8 0-.5-.2-.9-.5-1.2-.3-.3-.5-.7-.5-1.2 0-1 .8-1.8 1.8-1.8H17a3 3 0 003-3c0-5-4-9-8-9z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="7.5" cy="10.5" r="1.1" fill="currentColor"/><circle cx="10.5" cy="7" r="1.1" fill="currentColor"/><circle cx="15" cy="7.5" r="1.1" fill="currentColor"/></svg>
       </button>
       <div id="theme-menu" hidden></div>
-      <button id="design-studio-btn" class="btn-reset" title="Create theme from photo">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 3l1.9 4.6L18.5 9l-4.6 1.9L12 15.5l-1.9-4.6L5.5 9l4.6-1.9L12 3z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
-      </button>
     </div>
   </div>
   <div id="sidebar-overlay"></div>
@@ -225,34 +222,6 @@
     <div id="music-player-bar" class="music-player-bar" hidden>
       <div id="music-player-title" class="music-player-title"></div>
       <audio id="music-audio" controls></audio>
-    </div>
-  </div>
-</div>
-
-<div id="design-studio-modal" hidden>
-  <div class="settings-card files-card">
-    <div class="settings-header">
-      <span>Create a theme from a photo</span>
-      <button id="design-studio-close" class="btn-reset" title="Close">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-      </button>
-    </div>
-    <div class="settings-body">
-      <p class="secure-input-note" style="margin:0 0 12px;">
-        Upload a reference photo — a room, an object, a palette, anything with a mood you like.
-        The agent will design a matching theme (color, type, layout) and deploy it as a new
-        option in this menu.
-      </p>
-      <div id="design-studio-drop" class="files-drop">
-        <span id="design-studio-drop-label">Drag a photo here, or</span>
-        <button id="design-studio-pick-btn" class="btn-reset files-pick-btn">Choose photo</button>
-        <input type="file" id="design-studio-input" hidden accept="image/*" />
-      </div>
-      <img id="design-studio-preview" hidden alt="reference preview" />
-      <textarea id="design-studio-notes" placeholder="Optional notes — anything specific you want carried over or avoided…" rows="2"></textarea>
-      <div class="secure-input-actions">
-        <button id="design-studio-generate" class="btn-reset secure-input-btn secure-input-btn-primary" disabled>Generate &amp; deploy</button>
-      </div>
     </div>
   </div>
 </div>

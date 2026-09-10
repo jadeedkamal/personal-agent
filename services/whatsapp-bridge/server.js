@@ -263,7 +263,18 @@ client.on('message_create', async (msg) => {
 
     if (!isSelfChat) {
       const contact = await msg.getContact();
-      const senderNumber = (contact.number || '').replace(/[^\d]/g, '');
+      let senderNumber = (contact.number || '').replace(/[^\d]/g, '');
+      // WhatsApp's newer privacy defaults hide the real phone number behind a per-chat "LID"
+      // (contact.number/msg.from end in @lid, not @c.us) for senders who aren't in this
+      // account's address book. Resolve the LID back to the actual phone number so the
+      // allow-list check below compares against real numbers, not opaque LIDs.
+      const senderId = msg.author || msg.from;
+      if (senderId.endsWith('@lid')) {
+        const [resolved] = await client.getContactLidAndPhone([senderId]);
+        if (resolved && resolved.pn) {
+          senderNumber = resolved.pn.replace(/[^\d]/g, '');
+        }
+      }
       if (!ALLOWED_NUMBERS.includes(senderNumber)) {
         console.log(`[whatsapp-bridge] ignoring /download from non-allowed number ${senderNumber}`);
         return;

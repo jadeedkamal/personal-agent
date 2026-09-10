@@ -1,0 +1,235 @@
+/* ==========================================================================
+   Neo-brutalism theme
+   Thick black borders, hard offset shadows (no blur), flat saturated color
+   blocks, chunky bold type. Adds on top of the existing token system; does
+   not touch styles.css or any behavior/markup.
+   ========================================================================== */
+
+html[data-theme="neobrutalism"] {
+  color-scheme: light;
+  --bg: #f5efe0; --panel: #ffffff; --panel-2: #fff6e0; --border: #141414;
+  --text: #141414; --muted: #4a4a4a; --muted-2: #7a7a7a;
+  --accent: #ff4d8f; --accent-strong: #ff2f7d; --accent-dim: rgba(255,77,143,0.15);
+  --online: #2fd67d; --working: #ffb400; --danger: #ff3b3b;
+  --user-bubble: #3b7dff; --assistant-bubble: #ffffff;
+
+  --nb-yellow: #ffd23f; --nb-mint: #3dd6b0; --nb-blue: #3b7dff; --nb-pink: #ff4d8f; --nb-orange: #ff7a2f;
+  --nb-ink: #141414;
+  --nb-shadow: 4px 4px 0 var(--nb-ink);
+  --nb-shadow-sm: 3px 3px 0 var(--nb-ink);
+  --nb-shadow-lg: 6px 6px 0 var(--nb-ink);
+  --nb-font-display: 'Space Grotesk', -apple-system, sans-serif;
+}
+
+html[data-theme="neobrutalism"] body { font-family: 'Manrope', -apple-system, sans-serif; }
+
+html[data-theme="neobrutalism"] #header-title,
+html[data-theme="neobrutalism"] #sidebar .brand span,
+html[data-theme="neobrutalism"] .empty-state h2,
+html[data-theme="neobrutalism"] .convo-row .title,
+html[data-theme="neobrutalism"] .convo-section-label,
+html[data-theme="neobrutalism"] .settings-header span,
+html[data-theme="neobrutalism"] #login-screen h1,
+html[data-theme="neobrutalism"] .tool-feed-header .label,
+html[data-theme="neobrutalism"] #new-chat-btn,
+html[data-theme="neobrutalism"] #improve-btn,
+html[data-theme="neobrutalism"] #login-form button,
+html[data-theme="neobrutalism"] .secure-input-btn,
+html[data-theme="neobrutalism"] .files-pick-btn,
+html[data-theme="neobrutalism"] #status-pill span.label {
+  font-family: var(--nb-font-display); font-weight: 700;
+}
+html[data-theme="neobrutalism"] .convo-section-label { text-transform: none; letter-spacing: 0; opacity: 0.75; }
+
+/* Hard-shadow button recipe: flat fill, thick ink border, offset shadow that
+   collapses to nothing (and the button shifts into its own shadow) on press. */
+html[data-theme="neobrutalism"] .nb-hard,
+html[data-theme="neobrutalism"] #new-chat-btn,
+html[data-theme="neobrutalism"] #improve-btn,
+html[data-theme="neobrutalism"] #google-signin-btn,
+html[data-theme="neobrutalism"] #login-form button,
+html[data-theme="neobrutalism"] .icon-btn,
+html[data-theme="neobrutalism"] #send-btn,
+html[data-theme="neobrutalism"] #live-desktop-btn,
+html[data-theme="neobrutalism"] #notif-btn,
+html[data-theme="neobrutalism"] #theme-btn,
+html[data-theme="neobrutalism"] #settings-btn,
+html[data-theme="neobrutalism"] #files-btn,
+html[data-theme="neobrutalism"] #history-toggle-btn,
+html[data-theme="neobrutalism"] .files-pick-btn,
+html[data-theme="neobrutalism"] .secure-input-btn,
+html[data-theme="neobrutalism"] #image-viewer-close {
+  background: var(--panel); border: 3px solid var(--nb-ink); border-radius: 12px;
+  box-shadow: var(--nb-shadow-sm); color: var(--nb-ink);
+  transition: transform .06s ease, box-shadow .06s ease;
+}
+html[data-theme="neobrutalism"] .nb-hard:active,
+html[data-theme="neobrutalism"] #new-chat-btn:active,
+html[data-theme="neobrutalism"] #improve-btn:active,
+html[data-theme="neobrutalism"] .icon-btn:active,
+html[data-theme="neobrutalism"] #send-btn:active,
+html[data-theme="neobrutalism"] #live-desktop-btn:active,
+html[data-theme="neobrutalism"] .secure-input-btn:active,
+html[data-theme="neobrutalism"] .files-pick-btn:active {
+  transform: translate(3px, 3px); box-shadow: 0 0 0 var(--nb-ink);
+}
+html[data-theme="neobrutalism"] .nb-hard:hover,
+html[data-theme="neobrutalism"] #new-chat-btn:hover,
+html[data-theme="neobrutalism"] #improve-btn:hover,
+html[data-theme="neobrutalism"] #google-signin-btn:hover,
+html[data-theme="neobrutalism"] .files-pick-btn:hover { filter: brightness(1.04); }
+
+/* Boldness is spent here: the primary send/submit action is the one loud
+   color block in an otherwise flat, graphic UI. */
+html[data-theme="neobrutalism"] #new-chat-btn,
+html[data-theme="neobrutalism"] #send-btn,
+html[data-theme="neobrutalism"] #login-form button,
+html[data-theme="neobrutalism"] .secure-input-btn-primary {
+  background: var(--nb-pink); color: #fff;
+}
+html[data-theme="neobrutalism"] #send-btn.stop { background: var(--danger); }
+html[data-theme="neobrutalism"] #improve-btn svg { color: var(--nb-ink); }
+html[data-theme="neobrutalism"] #improve-btn:hover { border-color: var(--nb-ink); color: var(--nb-ink); background: var(--nb-yellow); }
+
+html[data-theme="neobrutalism"] .icon-btn,
+html[data-theme="neobrutalism"] #live-desktop-btn,
+html[data-theme="neobrutalism"] #notif-btn,
+html[data-theme="neobrutalism"] #theme-btn,
+html[data-theme="neobrutalism"] #settings-btn,
+html[data-theme="neobrutalism"] #files-btn,
+html[data-theme="neobrutalism"] #image-viewer-close { border-radius: 999px; }
+html[data-theme="neobrutalism"] .icon-btn.active,
+html[data-theme="neobrutalism"] #live-desktop-btn.active,
+html[data-theme="neobrutalism"] #notif-btn.active {
+  background: var(--nb-yellow); border-color: var(--nb-ink); color: var(--nb-ink);
+}
+
+/* ---------- Login ---------- */
+html[data-theme="neobrutalism"] #login-screen { background: var(--bg); }
+html[data-theme="neobrutalism"] #login-screen h1 { color: var(--nb-ink); }
+html[data-theme="neobrutalism"] #login-screen h1 svg { color: var(--nb-pink); }
+html[data-theme="neobrutalism"] #login-form input {
+  background: var(--panel); border: 3px solid var(--nb-ink); border-radius: 10px;
+  box-shadow: var(--nb-shadow-sm); color: var(--nb-ink); font-weight: 600;
+}
+html[data-theme="neobrutalism"] #login-form input:focus { outline: none; }
+html[data-theme="neobrutalism"] #login-divider::before, html[data-theme="neobrutalism"] #login-divider::after { background: var(--nb-ink); height: 2px; }
+html[data-theme="neobrutalism"] #google-signin-btn { color: var(--nb-ink); }
+
+/* ---------- Sidebar ---------- */
+html[data-theme="neobrutalism"] #sidebar { background: var(--panel); border-right: 3px solid var(--nb-ink); }
+html[data-theme="neobrutalism"] #sidebar .brand .logo,
+html[data-theme="neobrutalism"] .empty-state .logo {
+  background: var(--nb-yellow); border: 3px solid var(--nb-ink); box-shadow: var(--nb-shadow-sm);
+  border-radius: 10px;
+}
+html[data-theme="neobrutalism"] #sidebar .brand .logo svg,
+html[data-theme="neobrutalism"] .empty-state .logo svg { stroke: var(--nb-ink) !important; }
+
+html[data-theme="neobrutalism"] .search-box {
+  background: var(--panel); border: 3px solid var(--nb-ink); border-radius: 10px; box-shadow: var(--nb-shadow-sm);
+}
+html[data-theme="neobrutalism"] .search-box input { color: var(--nb-ink); font-weight: 600; }
+html[data-theme="neobrutalism"] .search-box svg { color: var(--nb-ink); }
+
+html[data-theme="neobrutalism"] .convo-row { border: 2px solid transparent; border-radius: 10px; }
+html[data-theme="neobrutalism"] .convo-row:hover { background: var(--nb-yellow); border-color: var(--nb-ink); }
+html[data-theme="neobrutalism"] .convo-row.active {
+  background: var(--nb-mint); border: 2px solid var(--nb-ink); box-shadow: var(--nb-shadow-sm);
+}
+html[data-theme="neobrutalism"] .convo-row .row-actions button:hover { background: var(--panel); border: 2px solid var(--nb-ink); }
+
+html[data-theme="neobrutalism"] #sidebar-footer { border-top: 3px solid var(--nb-ink); color: var(--nb-ink); font-weight: 600; }
+html[data-theme="neobrutalism"] #theme-btn, html[data-theme="neobrutalism"] #settings-btn, html[data-theme="neobrutalism"] #files-btn {
+  border: none; box-shadow: none; background: none;
+}
+html[data-theme="neobrutalism"] #theme-btn:hover, html[data-theme="neobrutalism"] #settings-btn:hover, html[data-theme="neobrutalism"] #files-btn:hover {
+  background: var(--nb-yellow);
+}
+html[data-theme="neobrutalism"] #theme-menu {
+  background: var(--panel); border: 3px solid var(--nb-ink); border-radius: 12px; box-shadow: var(--nb-shadow-lg);
+}
+html[data-theme="neobrutalism"] .theme-option { color: var(--nb-ink); border-radius: 8px; }
+html[data-theme="neobrutalism"] .theme-option:hover { background: var(--nb-yellow); }
+html[data-theme="neobrutalism"] .theme-option .swatch { border: 2px solid var(--nb-ink); }
+
+/* ---------- Header ---------- */
+html[data-theme="neobrutalism"] #header { background: var(--panel); border-bottom: 3px solid var(--nb-ink); }
+html[data-theme="neobrutalism"] #header-title { color: var(--nb-ink); }
+html[data-theme="neobrutalism"] #menu-btn { color: var(--nb-ink); }
+html[data-theme="neobrutalism"] #status-pill {
+  background: var(--panel); border: 2px solid var(--nb-ink); border-radius: 999px; box-shadow: var(--nb-shadow-sm);
+}
+html[data-theme="neobrutalism"] #status-pill span.label { color: var(--nb-ink); }
+html[data-theme="neobrutalism"] #status-pill .dot { border: 2px solid var(--nb-ink); }
+html[data-theme="neobrutalism"] #status-pill.online .dot { background: var(--online); box-shadow: none; }
+html[data-theme="neobrutalism"] #status-pill.working .dot { background: var(--working); box-shadow: none; }
+
+/* ---------- Live desktop / history bar ---------- */
+html[data-theme="neobrutalism"] #live-desktop-panel { border: 3px solid var(--nb-ink); border-top: none; }
+html[data-theme="neobrutalism"] #history-toggle-btn { color: var(--nb-ink); font-weight: 700; }
+
+/* ---------- Messages ---------- */
+html[data-theme="neobrutalism"] .msg-row.user .bubble {
+  background: var(--user-bubble); color: #fff; border: 3px solid var(--nb-ink);
+  border-radius: 14px 14px 3px 14px; box-shadow: var(--nb-shadow);
+}
+html[data-theme="neobrutalism"] .msg-row.assistant .bubble {
+  background: var(--assistant-bubble); border: 3px solid var(--nb-ink);
+  border-radius: 14px 14px 14px 3px; box-shadow: var(--nb-shadow);
+}
+html[data-theme="neobrutalism"] .msg-row.error .bubble { background: #ffe0e0; border-color: var(--nb-ink); color: #7a1616; }
+
+html[data-theme="neobrutalism"] .bubble code {
+  background: var(--nb-yellow); border: 2px solid var(--nb-ink); border-radius: 4px; color: var(--nb-ink);
+}
+html[data-theme="neobrutalism"] .code-block { background: #1c1c1c; border: 3px solid var(--nb-ink); border-radius: 8px; box-shadow: var(--nb-shadow-sm); }
+html[data-theme="neobrutalism"] .code-block .code-header { background: var(--nb-ink); color: var(--nb-yellow); border-bottom: 2px solid var(--nb-ink); }
+html[data-theme="neobrutalism"] .code-block pre { color: #f0f0f0; }
+html[data-theme="neobrutalism"] .tok-kw { color: #6fb8ff; } html[data-theme="neobrutalism"] .tok-str { color: var(--nb-yellow); }
+html[data-theme="neobrutalism"] .tok-num { color: #ff9de0; } html[data-theme="neobrutalism"] .tok-com { color: #9a9a9a; }
+
+html[data-theme="neobrutalism"] .bubble a.dl-link-btn {
+  background: var(--nb-pink); color: #fff; border: 3px solid var(--nb-ink); border-radius: 999px; box-shadow: var(--nb-shadow-sm);
+}
+
+html[data-theme="neobrutalism"] .tool-feed {
+  background: var(--nb-mint); border: 3px solid var(--nb-ink); border-radius: 10px; box-shadow: var(--nb-shadow-sm);
+  color: var(--nb-ink);
+}
+html[data-theme="neobrutalism"] .tool-feed-header .label,
+html[data-theme="neobrutalism"] .tool-step { color: var(--nb-ink); }
+html[data-theme="neobrutalism"] .tool-feed-body { border-top: 2px dashed var(--nb-ink); }
+html[data-theme="neobrutalism"] .tool-step-thumb, html[data-theme="neobrutalism"] .gallery-thumb {
+  border: 2px solid var(--nb-ink); border-radius: 8px; box-shadow: var(--nb-shadow-sm);
+}
+
+/* ---------- Modals ---------- */
+html[data-theme="neobrutalism"] .settings-card {
+  background: var(--panel); border: 3px solid var(--nb-ink); border-radius: 14px; box-shadow: var(--nb-shadow-lg);
+}
+html[data-theme="neobrutalism"] .settings-header { background: var(--nb-yellow); border-bottom: 3px solid var(--nb-ink); color: var(--nb-ink); }
+html[data-theme="neobrutalism"] .settings-row { border-bottom: 2px dashed var(--nb-ink); }
+html[data-theme="neobrutalism"] .settings-select, html[data-theme="neobrutalism"] #model-select {
+  background: var(--panel); border: 2px solid var(--nb-ink); border-radius: 8px; color: var(--nb-ink); font-weight: 600;
+}
+html[data-theme="neobrutalism"] #secure-input-modal .settings-header { border-bottom-color: var(--nb-ink); background: var(--nb-pink); color: #fff; }
+html[data-theme="neobrutalism"] #secure-input-value {
+  background: var(--panel); border: 3px solid var(--nb-ink); border-radius: 10px; color: var(--nb-ink); box-shadow: var(--nb-shadow-sm);
+}
+html[data-theme="neobrutalism"] .files-drop { border: 3px dashed var(--nb-ink); background: var(--panel-2); border-radius: 12px; }
+html[data-theme="neobrutalism"] .files-drop.drag-active { border-color: var(--nb-pink); background: var(--accent-dim); }
+html[data-theme="neobrutalism"] .files-pick-btn { color: var(--nb-ink); }
+html[data-theme="neobrutalism"] .files-row { border-bottom: 2px dashed var(--nb-ink); }
+html[data-theme="neobrutalism"] #image-viewer-close { color: var(--nb-ink); background: #fff; }
+
+/* ---------- Composer ---------- */
+html[data-theme="neobrutalism"] #composer-wrap { background: var(--panel); border-top: 3px solid var(--nb-ink); }
+html[data-theme="neobrutalism"] #input {
+  background: var(--panel); border: 3px solid var(--nb-ink); border-radius: 12px; color: var(--nb-ink);
+  box-shadow: var(--nb-shadow-sm); font-weight: 500;
+}
+html[data-theme="neobrutalism"] #input:focus { border-color: var(--nb-ink); box-shadow: var(--nb-shadow); }
+html[data-theme="neobrutalism"] .icon-btn.recording { background: var(--danger); border-color: var(--nb-ink); color: #fff; }
+html[data-theme="neobrutalism"] .attach-chip { background: var(--panel-2); border: 2px solid var(--nb-ink); border-radius: 10px; }
+html[data-theme="neobrutalism"] #model-picker-bar { color: var(--nb-ink); font-weight: 600; }
